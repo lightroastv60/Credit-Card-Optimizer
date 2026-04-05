@@ -229,12 +229,12 @@ optgroup { font-weight: 600; color: var(--ink); }
 
 <script>
 // ═══════════════════════════════════════════════════════════════════
-// CARD DATABASE (Updated Images, Issuers, Promos & Apply Links)
+// CARD DATABASE (Updated with Official Issuer Card Art)
 // ═══════════════════════════════════════════════════════════════════
 const CARDS = [
   {
     name: 'Chase Sapphire Preferred',
-    issuer: 'Chase', imgUrl: 'https://placehold.co/240x152/117aca/ffffff?text=Sapphire+Preferred',
+    issuer: 'Chase', imgUrl: 'https://creditcards.chase.com/K-8/v6/images/cardart/sapphire_preferred_card.png',
     fee: 95, earnType: 'points', pvCash: 0.01, pvPortal: 0.0125, pvTransfer: 0.02,
     applyUrl: 'https://creditcards.chase.com/rewards-credit-cards/sapphire/preferred',
     promo: { points: 75000, flatCash: 0, text: "75,000 points after $5k spend in 3 mos" },
@@ -251,7 +251,7 @@ const CARDS = [
   },
   {
     name: 'American Express Gold Card',
-    issuer: 'American Express', imgUrl: 'https://placehold.co/240x152/d4af37/ffffff?text=Amex+Gold',
+    issuer: 'American Express', imgUrl: 'https://icm.aexp-static.com/Internet/explorecards/US/en/cards/american-express-gold-card/gold-card-800x504.png',
     fee: 325, earnType: 'points', pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.02,
     applyUrl: 'https://www.americanexpress.com/us/credit-cards/card/gold-card/',
     promo: { points: 100000, flatCash: 0, text: "Up to 100k points after $6k spend in 6 mos" },
@@ -268,7 +268,7 @@ const CARDS = [
   },
   {
     name: 'Capital One Venture',
-    issuer: 'Capital One', imgUrl: 'https://placehold.co/240x152/002951/ffffff?text=Venture',
+    issuer: 'Capital One', imgUrl: 'https://ecm.capitalone.com/WCM/card/products/venture-card-art.png',
     fee: 95, earnType: 'miles', pvCash: 0.005, pvPortal: 0.01, pvTransfer: 0.02,
     applyUrl: 'https://www.capitalone.com/credit-cards/venture/',
     promo: { points: 75000, flatCash: 250, text: "75k miles + $250 travel credit after $4k spend" },
@@ -285,7 +285,7 @@ const CARDS = [
   },
   {
     name: 'Citi Strata Premier',
-    issuer: 'Citi', imgUrl: 'https://placehold.co/240x152/004b87/ffffff?text=Strata+Premier',
+    issuer: 'Citi', imgUrl: 'https://www.citi.com/CRD/images/citi-strata-premier-credit-card/citi-strata-premier-credit-card.jpg',
     fee: 95, earnType: 'points', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.02,
     applyUrl: 'https://www.citi.com/credit-cards/citi-strata-premier-credit-card',
     promo: { points: 70000, flatCash: 0, text: "70,000 points after $4k spend in 3 mos" },
@@ -302,7 +302,7 @@ const CARDS = [
   },
   {
     name: 'Wells Fargo Autograph',
-    issuer: 'Wells Fargo', imgUrl: 'https://placehold.co/240x152/b50012/ffffff?text=Autograph',
+    issuer: 'Wells Fargo', imgUrl: 'https://creditcards.wellsfargo.com/WFS/cardart/W_CC_Autograph.png',
     fee: 0, earnType: 'points', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.015,
     applyUrl: 'https://creditcards.wellsfargo.com/autograph-rewards-credit-card/',
     promo: { points: 20000, flatCash: 0, text: "20,000 points after $1k spend in 3 mos" },
@@ -319,7 +319,7 @@ const CARDS = [
   },
   {
     name: 'Bank of America Travel Rewards',
-    issuer: 'Bank of America', imgUrl: 'https://placehold.co/240x152/e0103a/ffffff?text=Travel+Rewards',
+    issuer: 'Bank of America', imgUrl: 'https://www.bankofamerica.com/content/images/ContextualSite/cre-7080-travel-rewards-cc-en_US-250x158.png',
     fee: 0, earnType: 'points', pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://www.bankofamerica.com/credit-cards/products/travel-rewards-credit-card/',
     promo: { points: 25000, flatCash: 0, text: "25,000 points after $1k spend in 90 days" },
@@ -336,7 +336,7 @@ const CARDS = [
   },
   {
     name: 'Discover it Miles',
-    issuer: 'Discover', imgUrl: 'https://placehold.co/240x152/f58220/ffffff?text=Discover+Miles',
+    issuer: 'Discover', imgUrl: 'https://www.discover.com/content/dam/dfs/credit-cards/card-art/cards/travel.png',
     fee: 0, earnType: 'miles', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://www.discover.com/credit-cards/travel/',
     promo: { points: 0, flatCash: 0, text: "Unlimited Mile Match at end of first year" },
@@ -353,7 +353,7 @@ const CARDS = [
   },
   {
     name: 'Discover it Cash Back',
-    issuer: 'Discover', imgUrl: 'https://placehold.co/240x152/000000/ffffff?text=Discover+Cash',
+    issuer: 'Discover', imgUrl: 'https://www.discover.com/content/dam/dfs/credit-cards/card-art/cards/cash-back.png',
     fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://www.discover.com/credit-cards/cash-back/',
     promo: { points: 0, flatCash: 0, text: "Unlimited Cash Back Match at end of first year" },
@@ -370,7 +370,7 @@ const CARDS = [
   },
   {
     name: 'Chase Freedom Unlimited',
-    issuer: 'Chase', imgUrl: 'https://placehold.co/240x152/d3e2f2/117aca?text=Freedom+Unlimited',
+    issuer: 'Chase', imgUrl: 'https://creditcards.chase.com/K-8/v6/images/cardart/freedom_unlimited_card.png',
     fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://creditcards.chase.com/cash-back-credit-cards/freedom/unlimited',
     promo: { points: 25000, flatCash: 0, text: "$250 bonus after $500 spend in 3 mos" },
@@ -387,7 +387,7 @@ const CARDS = [
   },
   {
     name: 'Chase Freedom Flex',
-    issuer: 'Chase', imgUrl: 'https://placehold.co/240x152/117aca/ffffff?text=Freedom+Flex',
+    issuer: 'Chase', imgUrl: 'https://creditcards.chase.com/K-8/v6/images/cardart/freedom_flex_card.png',
     fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://creditcards.chase.com/cash-back-credit-cards/freedom/flex',
     promo: { points: 20000, flatCash: 0, text: "$200 bonus after $500 spend in 3 mos" },
@@ -404,7 +404,7 @@ const CARDS = [
   },
   {
     name: 'Amex Blue Cash Preferred',
-    issuer: 'American Express', imgUrl: 'https://placehold.co/240x152/002663/ffffff?text=Blue+Cash+Pref',
+    issuer: 'American Express', imgUrl: 'https://icm.aexp-static.com/Internet/explorecards/US/en/cards/blue-cash-preferred-card/blue-cash-preferred-card-800x504.png',
     fee: 95, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://www.americanexpress.com/us/credit-cards/card/blue-cash-preferred/',
     promo: { points: 25000, flatCash: 0, text: "$250 statement credit after $3k spend in 6 mos" },
@@ -421,7 +421,7 @@ const CARDS = [
   },
   {
     name: 'Amex Blue Cash Everyday',
-    issuer: 'American Express', imgUrl: 'https://placehold.co/240x152/ffffff/002663?text=Blue+Cash+Everyday',
+    issuer: 'American Express', imgUrl: 'https://icm.aexp-static.com/Internet/explorecards/US/en/cards/blue-cash-everyday-card/blue-cash-everyday-card-800x504.png',
     fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://www.americanexpress.com/us/credit-cards/card/blue-cash-everyday/',
     promo: { points: 20000, flatCash: 0, text: "$200 statement credit after $2k spend in 6 mos" },
@@ -438,7 +438,7 @@ const CARDS = [
   },
   {
     name: 'Citi Double Cash',
-    issuer: 'Citi', imgUrl: 'https://placehold.co/240x152/004b87/ffffff?text=Double+Cash',
+    issuer: 'Citi', imgUrl: 'https://www.citi.com/CRD/images/citi-double-cash-credit-card/citi-double-cash-credit-card.jpg',
     fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://www.citi.com/credit-cards/citi-double-cash-credit-card',
     promo: { points: 20000, flatCash: 0, text: "$200 cash back after $1,500 spend in 6 mos" },
@@ -455,7 +455,7 @@ const CARDS = [
   },
   {
     name: 'Capital One Savor Cash',
-    issuer: 'Capital One', imgUrl: 'https://placehold.co/240x152/e0a05a/ffffff?text=Savor',
+    issuer: 'Capital One', imgUrl: 'https://ecm.capitalone.com/WCM/card/products/savor-card-art.png',
     fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://www.capitalone.com/credit-cards/savor/',
     promo: { points: 25000, flatCash: 0, text: "$250 cash bonus after $500 spend in 3 mos" },
@@ -472,7 +472,7 @@ const CARDS = [
   },
   {
     name: 'Wells Fargo Active Cash',
-    issuer: 'Wells Fargo', imgUrl: 'https://placehold.co/240x152/b50012/ffffff?text=Active+Cash',
+    issuer: 'Wells Fargo', imgUrl: 'https://creditcards.wellsfargo.com/WFS/cardart/W_CC_Active_Cash.png',
     fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://creditcards.wellsfargo.com/active-cash-credit-card/',
     promo: { points: 20000, flatCash: 0, text: "$200 cash rewards after $500 spend in 3 mos" },
@@ -489,7 +489,7 @@ const CARDS = [
   },
   {
     name: 'Chase Sapphire Reserve',
-    issuer: 'Chase', imgUrl: 'https://placehold.co/240x152/000000/ffffff?text=Sapphire+Reserve',
+    issuer: 'Chase', imgUrl: 'https://creditcards.chase.com/K-8/v6/images/cardart/sapphire_reserve_card.png',
     fee: 795, earnType: 'points', pvCash: 0.01, pvPortal: 0.015, pvTransfer: 0.02,
     applyUrl: 'https://creditcards.chase.com/rewards-credit-cards/sapphire/reserve',
     promo: { points: 125000, flatCash: 0, text: "125,000 points after $6k spend in 3 mos" },
@@ -506,7 +506,7 @@ const CARDS = [
   },
   {
     name: 'American Express Platinum',
-    issuer: 'American Express', imgUrl: 'https://placehold.co/240x152/e0e1e2/000000?text=Amex+Platinum',
+    issuer: 'American Express', imgUrl: 'https://icm.aexp-static.com/Internet/explorecards/US/en/cards/platinum-card/platinum-card-800x504.png',
     fee: 895, earnType: 'points', pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.02,
     applyUrl: 'https://www.americanexpress.com/us/credit-cards/card/platinum/',
     promo: { points: 150000, flatCash: 0, text: "Up to 150k points after $8k spend in 6 mos" },
@@ -523,7 +523,7 @@ const CARDS = [
   },
   {
     name: 'American Express Business Platinum',
-    issuer: 'American Express', imgUrl: 'https://placehold.co/240x152/e0e1e2/000000?text=Biz+Platinum',
+    issuer: 'American Express', imgUrl: 'https://icm.aexp-static.com/Internet/explorecards/US/en/cards/business-platinum-card/business-platinum-card-800x504.png',
     fee: 695, earnType: 'points', pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.02,
     applyUrl: 'https://www.americanexpress.com/us/credit-cards/card/business-platinum/',
     promo: { points: 250000, flatCash: 0, text: "Up to 250k points after $20k spend in 3 mos" },
@@ -540,7 +540,7 @@ const CARDS = [
   },
   {
     name: 'American Express Business Gold',
-    issuer: 'American Express', imgUrl: 'https://placehold.co/240x152/d4af37/ffffff?text=Biz+Gold',
+    issuer: 'American Express', imgUrl: 'https://icm.aexp-static.com/Internet/explorecards/US/en/cards/business-gold-card/business-gold-card-800x504.png',
     fee: 375, earnType: 'points', pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.02,
     applyUrl: 'https://www.americanexpress.com/us/credit-cards/card/business-gold/',
     promo: { points: 150000, flatCash: 0, text: "Up to 150k points after $15k spend in 3 mos" },
@@ -557,7 +557,7 @@ const CARDS = [
   },
   {
     name: 'Capital One Venture X',
-    issuer: 'Capital One', imgUrl: 'https://placehold.co/240x152/002951/ffffff?text=Venture+X',
+    issuer: 'Capital One', imgUrl: 'https://ecm.capitalone.com/WCM/card/products/venture-x/venture-x-card-art.png',
     fee: 395, earnType: 'miles', pvCash: 0.005, pvPortal: 0.01, pvTransfer: 0.02,
     applyUrl: 'https://www.capitalone.com/credit-cards/venture-x/',
     promo: { points: 75000, flatCash: 0, text: "75,000 miles after $4k spend in 3 mos" },
