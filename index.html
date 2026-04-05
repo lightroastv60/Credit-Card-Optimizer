@@ -133,19 +133,22 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.18); }
 .rec-name { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rec-why { font-size: 11px; color: var(--ink2); margin-top: 2px; line-height: 1.4; }
 
-/* HORIZONTAL VALUE SUMMARY (NEW) */
-.rec-value { text-align: right; flex-shrink: 0; display: flex; align-items: center; gap: 12px; }
+/* HORIZONTAL VALUE SUMMARY */
+.rec-value { text-align: right; flex-shrink: 0; display: flex; align-items: center; gap: 0; }
+.rec-promo { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; padding-right: 16px; border-right: 1px solid var(--border); margin-right: 16px; }
 .rec-summary { display: grid; grid-template-columns: 50px 50px 65px; gap: 16px; border-right: 1px solid var(--border); padding-right: 16px; margin-right: 8px; }
 .rec-stat { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; }
 .rec-stat-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink3); margin-bottom: 2px; }
 .rec-stat-label.hard-label { color: var(--hard); }
 .rec-stat-label.soft-label { color: var(--soft); }
+.rec-stat-label.promo-label { color: var(--amber); }
 .rec-stat-num { font-family: 'DM Mono', monospace; font-size: 14px; color: var(--ink); font-weight: 500; }
+.rec-stat.promo .rec-stat-num { color: var(--amber); font-weight: 600; }
 .rec-stat.total .rec-stat-num { font-size: 16px; color: var(--accent); font-weight: 600; }
 .rec-nums { width: 80px; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; }
 .rec-delta { font-size: 11px; color: var(--ink3); text-align: right; }
 .rec-delta.positive { color: #2D7A3D; }
-.rec-chevron { font-size: 11px; color: var(--ink3); transition: transform 0.22s; flex-shrink: 0; }
+.rec-chevron { font-size: 11px; color: var(--ink3); transition: transform 0.22s; flex-shrink: 0; margin-left: 8px; }
 .rec-wrap.open .rec-chevron { transform: rotate(180deg); color: var(--accent); }
 .rec-type-badge { display: inline-block; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 5px; border-radius: 4px; margin-left: 5px; vertical-align: middle; }
 .badge-points { background: #E8EEF5; color: var(--hard); }
@@ -155,7 +158,8 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.18); }
 /* DRAWER */
 .rec-drawer { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; background: var(--card); border: 1.5px solid var(--accent); border-top: none; border-radius: 0 0 var(--radius) var(--radius); }
 .rec-wrap.open .rec-drawer { max-height: 800px; }
-.drawer-inner { padding: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.drawer-promo { background: var(--amber-light); border: 1px dashed var(--amber); color: #9A5210; padding: 10px 18px; font-size: 12px; border-radius: 8px; margin: 18px 18px 0; text-align: center;}
+.drawer-inner { padding: 14px 18px 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .value-card { border-radius: 8px; padding: 16px; border: 1.5px solid transparent; }
 .value-card.hard { background: var(--hard-light); border-color: rgba(30,58,95,0.15); }
 .value-card.soft { background: var(--soft-light); border-color: rgba(90,48,96,0.12); }
@@ -181,6 +185,17 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.18); }
 @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 .fade-up { animation: fadeUp 0.28s ease forwards; }
 
+@media (max-width: 768px) {
+  .rec-card { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .rec-info { width: 100%; }
+  .rec-value { width: 100%; justify-content: flex-start; }
+  .rec-promo { padding-right: 16px; margin-right: 16px; align-items: flex-start; }
+  .rec-summary { flex: 1; justify-content: space-between; grid-template-columns: auto auto auto; border-right: none; padding-right: 0; margin-right: 0; }
+  .rec-stat { align-items: flex-start; }
+  .rec-nums { display: none; }
+  .rec-chevron { margin-left: auto; align-self: center; }
+}
+
 @media (max-width: 600px) {
   .profiles { grid-template-columns: 1fr; }
   .strategy-controls { grid-template-columns: 1fr; }
@@ -188,12 +203,6 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.18); }
   .drawer-inner { grid-template-columns: 1fr; }
   .category, .sub-row { grid-template-columns: 130px 1fr 76px 24px; }
   .header h1 { font-size: 26px; }
-  
-  /* Mobile adjustments for horizontal stats */
-  .rec-summary { grid-template-columns: 45px 45px 55px; gap: 8px; padding-right: 10px; margin-right: 4px; }
-  .rec-stat-num { font-size: 12px; }
-  .rec-stat.total .rec-stat-num { font-size: 14px; }
-  .rec-nums { width: 60px; }
 }
 </style>
 </head>
@@ -208,13 +217,13 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.18); }
 
 <script>
 // ═══════════════════════════════════════════════════════════════════
-// CARD DATABASE (20 Cards - Multi-tiered Redemption Values)
+// CARD DATABASE (Updated Promos for April 2026)
 // ═══════════════════════════════════════════════════════════════════
 const CARDS = [
   {
     name: 'Chase Sapphire Preferred',
-    fee: 95, earnType: 'points', 
-    pvCash: 0.01, pvPortal: 0.0125, pvTransfer: 0.02,
+    fee: 95, earnType: 'points', pvCash: 0.01, pvPortal: 0.0125, pvTransfer: 0.02,
+    promo: { points: 75000, flatCash: 0, text: "75,000 points after $5k spend in 3 mos" },
     rates: {
       grocery_instore:  [{rate:3,cap:null}], grocery_online:   [{rate:3,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
       dining:           [{rate:3,cap:null}], delivery:         [{rate:3,cap:null}],
@@ -228,8 +237,8 @@ const CARDS = [
   },
   {
     name: 'American Express Gold Card',
-    fee: 325, earnType: 'points', 
-    pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.02,
+    fee: 325, earnType: 'points', pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.02,
+    promo: { points: 100000, flatCash: 0, text: "Up to 100k points after $6k spend in 6 mos" },
     rates: {
       grocery_instore:  [{rate:4,cap:25000},{rate:1,cap:null}], grocery_online:   [{rate:1,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
       dining:           [{rate:4,cap:50000},{rate:1,cap:null}], delivery:         [{rate:4,cap:null}],
@@ -243,8 +252,8 @@ const CARDS = [
   },
   {
     name: 'Capital One Venture',
-    fee: 95, earnType: 'miles', 
-    pvCash: 0.005, pvPortal: 0.01, pvTransfer: 0.02,
+    fee: 95, earnType: 'miles', pvCash: 0.005, pvPortal: 0.01, pvTransfer: 0.02,
+    promo: { points: 75000, flatCash: 250, text: "75k miles + $250 travel credit after $4k spend" },
     rates: {
       grocery_instore:  [{rate:2,cap:null}], grocery_online:   [{rate:2,cap:null}], grocery_wholesale:[{rate:2,cap:null}],
       dining:           [{rate:2,cap:null}], delivery:         [{rate:2,cap:null}],
@@ -258,8 +267,8 @@ const CARDS = [
   },
   {
     name: 'Citi Strata Premier',
-    fee: 95, earnType: 'points', 
-    pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.02,
+    fee: 95, earnType: 'points', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.02,
+    promo: { points: 70000, flatCash: 0, text: "70,000 points after $4k spend in 3 mos" },
     rates: {
       grocery_instore:  [{rate:3,cap:null}], grocery_online:   [{rate:3,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
       dining:           [{rate:3,cap:null}], delivery:         [{rate:3,cap:null}],
@@ -273,8 +282,8 @@ const CARDS = [
   },
   {
     name: 'Wells Fargo Autograph',
-    fee: 0, earnType: 'points', 
-    pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.015,
+    fee: 0, earnType: 'points', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.015,
+    promo: { points: 20000, flatCash: 0, text: "20,000 points after $1k spend in 3 mos" },
     rates: {
       grocery_instore:  [{rate:1,cap:null}], grocery_online:   [{rate:1,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
       dining:           [{rate:3,cap:null}], delivery:         [{rate:3,cap:null}],
@@ -288,8 +297,8 @@ const CARDS = [
   },
   {
     name: 'Bank of America Travel Rewards',
-    fee: 0, earnType: 'points', 
-    pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.01,
+    fee: 0, earnType: 'points', pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.01,
+    promo: { points: 25000, flatCash: 0, text: "25,000 points after $1k spend in 90 days" },
     rates: {
       grocery_instore:  [{rate:1.5,cap:null}], grocery_online:   [{rate:1.5,cap:null}], grocery_wholesale:[{rate:1.5,cap:null}],
       dining:           [{rate:1.5,cap:null}], delivery:         [{rate:1.5,cap:null}],
@@ -303,8 +312,8 @@ const CARDS = [
   },
   {
     name: 'Discover it Miles',
-    fee: 0, earnType: 'miles', 
-    pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    fee: 0, earnType: 'miles', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    promo: { points: 0, flatCash: 0, text: "Unlimited Mile Match at end of first year" },
     rates: {
       grocery_instore:  [{rate:1.5,cap:null}], grocery_online:   [{rate:1.5,cap:null}], grocery_wholesale:[{rate:1.5,cap:null}],
       dining:           [{rate:1.5,cap:null}], delivery:         [{rate:1.5,cap:null}],
@@ -318,8 +327,8 @@ const CARDS = [
   },
   {
     name: 'Discover it Cash Back',
-    fee: 0, earnType: 'cash', 
-    pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    promo: { points: 0, flatCash: 0, text: "Unlimited Cash Back Match at end of first year" },
     rates: {
       grocery_instore:  [{rate:1,cap:null}], grocery_online:   [{rate:1,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
       dining:           [{rate:1,cap:null}], delivery:         [{rate:1,cap:null}],
@@ -333,8 +342,8 @@ const CARDS = [
   },
   {
     name: 'Chase Freedom Unlimited',
-    fee: 0, earnType: 'cash', 
-    pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    promo: { points: 25000, flatCash: 0, text: "$250 bonus after $500 spend in 3 mos" },
     rates: {
       grocery_instore:  [{rate:1.5,cap:null}], grocery_online:   [{rate:1.5,cap:null}], grocery_wholesale:[{rate:1.5,cap:null}],
       dining:           [{rate:3,cap:null}], delivery:         [{rate:3,cap:null}],
@@ -348,8 +357,8 @@ const CARDS = [
   },
   {
     name: 'Chase Freedom Flex',
-    fee: 0, earnType: 'cash', 
-    pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    promo: { points: 20000, flatCash: 0, text: "$200 bonus after $500 spend in 3 mos" },
     rates: {
       grocery_instore:  [{rate:1,cap:null}], grocery_online:   [{rate:1,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
       dining:           [{rate:3,cap:null}], delivery:         [{rate:3,cap:null}],
@@ -363,8 +372,8 @@ const CARDS = [
   },
   {
     name: 'Amex Blue Cash Preferred',
-    fee: 95, earnType: 'cash', 
-    pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    fee: 95, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    promo: { points: 25000, flatCash: 0, text: "$250 statement credit after $3k spend in 6 mos" },
     rates: {
       grocery_instore:  [{rate:6,cap:6000},{rate:1,cap:null}], grocery_online:   [{rate:1,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
       dining:           [{rate:1,cap:null}], delivery:         [{rate:1,cap:null}],
@@ -378,8 +387,8 @@ const CARDS = [
   },
   {
     name: 'Amex Blue Cash Everyday',
-    fee: 0, earnType: 'cash', 
-    pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    promo: { points: 20000, flatCash: 0, text: "$200 statement credit after $2k spend in 6 mos" },
     rates: {
       grocery_instore:  [{rate:3,cap:6000},{rate:1,cap:null}], grocery_online:   [{rate:3,cap:6000},{rate:1,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
       dining:           [{rate:1,cap:null}], delivery:         [{rate:1,cap:null}],
@@ -393,8 +402,8 @@ const CARDS = [
   },
   {
     name: 'Citi Double Cash',
-    fee: 0, earnType: 'cash', 
-    pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    promo: { points: 20000, flatCash: 0, text: "$200 cash back after $1,500 spend in 6 mos" },
     rates: {
       grocery_instore:  [{rate:2,cap:null}], grocery_online:   [{rate:2,cap:null}], grocery_wholesale:[{rate:2,cap:null}],
       dining:           [{rate:2,cap:null}], delivery:         [{rate:2,cap:null}],
@@ -408,8 +417,8 @@ const CARDS = [
   },
   {
     name: 'Capital One Savor Cash',
-    fee: 0, earnType: 'cash', 
-    pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    promo: { points: 25000, flatCash: 0, text: "$250 cash bonus after $500 spend in 3 mos" },
     rates: {
       grocery_instore:  [{rate:3,cap:null}], grocery_online:   [{rate:3,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
       dining:           [{rate:3,cap:null}], delivery:         [{rate:3,cap:null}],
@@ -423,8 +432,8 @@ const CARDS = [
   },
   {
     name: 'Wells Fargo Active Cash',
-    fee: 0, earnType: 'cash', 
-    pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    promo: { points: 20000, flatCash: 0, text: "$200 cash rewards after $500 spend in 3 mos" },
     rates: {
       grocery_instore:  [{rate:2,cap:null}], grocery_online:   [{rate:2,cap:null}], grocery_wholesale:[{rate:2,cap:null}],
       dining:           [{rate:2,cap:null}], delivery:         [{rate:2,cap:null}],
@@ -438,8 +447,8 @@ const CARDS = [
   },
   {
     name: 'Chase Sapphire Reserve',
-    fee: 795, earnType: 'points', 
-    pvCash: 0.01, pvPortal: 0.015, pvTransfer: 0.02,
+    fee: 795, earnType: 'points', pvCash: 0.01, pvPortal: 0.015, pvTransfer: 0.02,
+    promo: { points: 125000, flatCash: 0, text: "125,000 points after $6k spend in 3 mos" },
     rates: {
       grocery_instore:  [{rate:1,cap:null}], grocery_online:   [{rate:1,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
       dining:           [{rate:3,cap:null}], delivery:         [{rate:3,cap:null}],
@@ -453,8 +462,8 @@ const CARDS = [
   },
   {
     name: 'American Express Platinum',
-    fee: 895, earnType: 'points', 
-    pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.02,
+    fee: 895, earnType: 'points', pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.02,
+    promo: { points: 150000, flatCash: 0, text: "Up to 150k points after $8k spend in 6 mos" },
     rates: {
       grocery_instore:  [{rate:1,cap:null}], grocery_online:   [{rate:1,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
       dining:           [{rate:1,cap:null}], delivery:         [{rate:1,cap:null}],
@@ -468,8 +477,8 @@ const CARDS = [
   },
   {
     name: 'American Express Business Platinum',
-    fee: 695, earnType: 'points', 
-    pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.02,
+    fee: 695, earnType: 'points', pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.02,
+    promo: { points: 250000, flatCash: 0, text: "Up to 250k points after $20k spend in 3 mos" },
     rates: {
       grocery_instore:  [{rate:1,cap:null}], grocery_online:   [{rate:1,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
       dining:           [{rate:1,cap:null}], delivery:         [{rate:1,cap:null}],
@@ -483,8 +492,8 @@ const CARDS = [
   },
   {
     name: 'American Express Business Gold',
-    fee: 375, earnType: 'points', 
-    pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.02,
+    fee: 375, earnType: 'points', pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.02,
+    promo: { points: 150000, flatCash: 0, text: "Up to 150k points after $15k spend in 3 mos" },
     rates: {
       grocery_instore:  [{rate:1,cap:null}], grocery_online:   [{rate:1,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
       dining:           [{rate:4,cap:150000},{rate:1,cap:null}], delivery:         [{rate:4,cap:null}],
@@ -498,8 +507,8 @@ const CARDS = [
   },
   {
     name: 'Capital One Venture X',
-    fee: 395, earnType: 'miles', 
-    pvCash: 0.005, pvPortal: 0.01, pvTransfer: 0.02,
+    fee: 395, earnType: 'miles', pvCash: 0.005, pvPortal: 0.01, pvTransfer: 0.02,
+    promo: { points: 75000, flatCash: 0, text: "75,000 miles after $4k spend in 3 mos" },
     rates: {
       grocery_instore:  [{rate:2,cap:null}], grocery_online:   [{rate:2,cap:null}], grocery_wholesale:[{rate:2,cap:null}],
       dining:           [{rate:2,cap:null}], delivery:         [{rate:2,cap:null}],
@@ -655,10 +664,12 @@ function calcCard(card) {
   const breakdown = {};
   let rawRewards  = 0;
   
-  // Select the appropriate point value based on the global user strategy
   let activePv = currentStrategy === 'cash' ? card.pvCash : 
                  currentStrategy === 'portal' ? card.pvPortal : 
                  card.pvTransfer;
+
+  // Calculate promotional value based on selected strategy
+  const promoValue = (card.promo.points * activePv) + card.promo.flatCash;
 
   for (const [cat, tiers] of Object.entries(card.rates)) {
     const annualSpend = (spend[cat] || 0) * 12;
@@ -676,7 +687,7 @@ function calcCard(card) {
   const hard  = rawRewards + annivBonus - card.fee;
   const net   = hard + soft.total;
 
-  return { hard, soft: soft.total, softItems: soft.items, net, rawRewards, annivBonus, breakdown, activePv };
+  return { hard, soft: soft.total, softItems: soft.items, net, rawRewards, annivBonus, breakdown, activePv, promoValue };
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -858,7 +869,13 @@ function buildDrawer(r, currentResult) {
     : 'Cards are roughly equivalent';
   const badgeBg = isCurrent ? '#2D7A3D' : (d !== null && d > 5) ? 'var(--accent)' : '#888';
 
-  return `<div class="drawer-inner">
+  const promoHTML = r.promoValue > 0 
+    ? `<div class="drawer-promo"><strong>Sign-on Promo:</strong> ${r.card.promo.text} <br><span style="opacity:0.8; margin-top:2px; display:inline-block;">(Valued at <strong>${fmt(r.promoValue)}</strong> using your ${currentStrategy} strategy at ${(r.activePv*100).toFixed(1)}¢/pt)</span></div>`
+    : `<div class="drawer-promo"><strong>Sign-on Promo:</strong> ${r.card.promo.text}</div>`;
+
+  return `
+  ${promoHTML}
+  <div class="drawer-inner">
     <div class="value-card hard">
       <div class="value-type">Hard value (Valued at ${(r.activePv * 100).toFixed(2)}¢/pt)</div>
       <div class="value-amount">${fmt(r.hard)}</div>
@@ -901,7 +918,9 @@ function renderRankings() {
     const topCat = Object.entries(r.breakdown).sort(([,a],[,b])=>b-a)[0];
     const topRate = topCat ? fmtR(r.card.rates[topCat[0]][0].rate, r.card.earnType) : '';
     const topLabel = topCat ? CAT_LABELS[topCat[0]] : '';
-    const why = topLabel ? `Best earn: ${topRate} on ${topLabel}` + (r.card.anniversaryPct > 0 ? ` · ${(r.card.anniversaryPct*100).toFixed(0)}% anniv. bonus` : r.card.anniversaryFlat > 0 ? ` · ${(r.card.anniversaryFlat/1000).toFixed(0)}k anniv. miles` : '') : '';
+    const why = topLabel ? `Best earn: ${topRate} on ${topLabel}` : '';
+    
+    const promoStr = r.promoValue > 0 ? `Up to ${fmt(r.promoValue)}` : 'Match';
 
     return `<div class="rec-wrap${isOpen ? ' open' : ''} fade-up" style="animation-delay:${i*0.03}s">
       <div class="rec-card${i===0?' top':''}" onclick="toggleDrawer('${r.card.name.replace(/'/g,"\\'")}')">
@@ -911,6 +930,10 @@ function renderRankings() {
           <div class="rec-why">${why}</div>
         </div>
         <div class="rec-value">
+          <div class="rec-promo">
+            <span class="rec-stat-label promo-label">Sign-On Bonus</span>
+            <span class="rec-stat-num promo">${promoStr}</span>
+          </div>
           <div class="rec-summary">
             <div class="rec-stat"><span class="rec-stat-label hard-label">Hard</span><span class="rec-stat-num">${fmt(r.hard)}</span></div>
             <div class="rec-stat"><span class="rec-stat-label soft-label">Soft</span><span class="rec-stat-num">${fmt(r.soft)}</span></div>
