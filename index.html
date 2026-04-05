@@ -120,6 +120,7 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.18); }
 .current-card-select label { font-size: 13px; color: var(--ink2); white-space: nowrap; }
 .current-card-select select { flex: 1; font-family: 'Instrument Sans', sans-serif; font-size: 13px; padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--card); color: var(--ink); cursor: pointer; outline: none; }
 .current-card-select select:focus { border-color: var(--accent); }
+optgroup { font-weight: 600; color: var(--ink); }
 
 /* RECS + DRAWER */
 .rec-wrap { margin-bottom: 10px; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
@@ -161,8 +162,10 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.18); }
 
 /* DRAWER */
 .rec-drawer { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; background: var(--card); border: 1.5px solid var(--accent); border-top: none; border-radius: 0 0 var(--radius) var(--radius); }
-.rec-wrap.open .rec-drawer { max-height: 800px; }
-.drawer-promo { background: var(--amber-light); border: 1px dashed var(--amber); color: #9A5210; padding: 10px 18px; font-size: 12px; border-radius: 8px; margin: 18px 18px 0; text-align: center;}
+.rec-wrap.open .rec-drawer { max-height: 1000px; }
+.drawer-header-row { display: flex; gap: 16px; margin: 18px 18px 0; align-items: stretch; }
+.drawer-card-img { width: 140px; height: 88px; object-fit: cover; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border: 1px solid var(--border); flex-shrink: 0; }
+.drawer-promo { flex: 1; display: flex; flex-direction: column; justify-content: center; background: var(--amber-light); border: 1px dashed var(--amber); color: #9A5210; padding: 10px 18px; font-size: 12px; border-radius: 8px; }
 .drawer-inner { padding: 14px 18px 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .value-card { border-radius: 8px; padding: 16px; border: 1.5px solid transparent; }
 .value-card.hard { background: var(--hard-light); border-color: rgba(30,58,95,0.15); }
@@ -210,13 +213,15 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.18); }
   .header h1 { font-size: 26px; }
   .rec-promo { padding-right: 10px; margin-right: 10px; }
   .rec-summary { grid-template-columns: auto auto auto; gap: 10px; }
+  .drawer-header-row { flex-direction: column; align-items: center; text-align: center; }
+  .drawer-card-img { width: 100%; height: auto; max-width: 200px; }
 }
 </style>
 </head>
 <body>
 <div class="page">
   <div class="header">
-    <h1>What's your card <em>actually</em> worth?</h1>
+    <h1>Let's find the card that works for <em>you</em>.</h1>
     <p>Dial in your real spending and lifestyle. We'll calculate hard rewards and soft value for every card — then rank them for you.</p>
   </div>
   <div id="app"></div>
@@ -224,11 +229,12 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.18); }
 
 <script>
 // ═══════════════════════════════════════════════════════════════════
-// CARD DATABASE (Updated Promos & Apply Links)
+// CARD DATABASE (Updated Images, Issuers, Promos & Apply Links)
 // ═══════════════════════════════════════════════════════════════════
 const CARDS = [
   {
     name: 'Chase Sapphire Preferred',
+    issuer: 'Chase', imgUrl: 'https://placehold.co/240x152/117aca/ffffff?text=Sapphire+Preferred',
     fee: 95, earnType: 'points', pvCash: 0.01, pvPortal: 0.0125, pvTransfer: 0.02,
     applyUrl: 'https://creditcards.chase.com/rewards-credit-cards/sapphire/preferred',
     promo: { points: 75000, flatCash: 0, text: "75,000 points after $5k spend in 3 mos" },
@@ -245,6 +251,7 @@ const CARDS = [
   },
   {
     name: 'American Express Gold Card',
+    issuer: 'American Express', imgUrl: 'https://placehold.co/240x152/d4af37/ffffff?text=Amex+Gold',
     fee: 325, earnType: 'points', pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.02,
     applyUrl: 'https://www.americanexpress.com/us/credit-cards/card/gold-card/',
     promo: { points: 100000, flatCash: 0, text: "Up to 100k points after $6k spend in 6 mos" },
@@ -261,6 +268,7 @@ const CARDS = [
   },
   {
     name: 'Capital One Venture',
+    issuer: 'Capital One', imgUrl: 'https://placehold.co/240x152/002951/ffffff?text=Venture',
     fee: 95, earnType: 'miles', pvCash: 0.005, pvPortal: 0.01, pvTransfer: 0.02,
     applyUrl: 'https://www.capitalone.com/credit-cards/venture/',
     promo: { points: 75000, flatCash: 250, text: "75k miles + $250 travel credit after $4k spend" },
@@ -277,6 +285,7 @@ const CARDS = [
   },
   {
     name: 'Citi Strata Premier',
+    issuer: 'Citi', imgUrl: 'https://placehold.co/240x152/004b87/ffffff?text=Strata+Premier',
     fee: 95, earnType: 'points', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.02,
     applyUrl: 'https://www.citi.com/credit-cards/citi-strata-premier-credit-card',
     promo: { points: 70000, flatCash: 0, text: "70,000 points after $4k spend in 3 mos" },
@@ -293,6 +302,7 @@ const CARDS = [
   },
   {
     name: 'Wells Fargo Autograph',
+    issuer: 'Wells Fargo', imgUrl: 'https://placehold.co/240x152/b50012/ffffff?text=Autograph',
     fee: 0, earnType: 'points', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.015,
     applyUrl: 'https://creditcards.wellsfargo.com/autograph-rewards-credit-card/',
     promo: { points: 20000, flatCash: 0, text: "20,000 points after $1k spend in 3 mos" },
@@ -309,6 +319,7 @@ const CARDS = [
   },
   {
     name: 'Bank of America Travel Rewards',
+    issuer: 'Bank of America', imgUrl: 'https://placehold.co/240x152/e0103a/ffffff?text=Travel+Rewards',
     fee: 0, earnType: 'points', pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://www.bankofamerica.com/credit-cards/products/travel-rewards-credit-card/',
     promo: { points: 25000, flatCash: 0, text: "25,000 points after $1k spend in 90 days" },
@@ -325,6 +336,7 @@ const CARDS = [
   },
   {
     name: 'Discover it Miles',
+    issuer: 'Discover', imgUrl: 'https://placehold.co/240x152/f58220/ffffff?text=Discover+Miles',
     fee: 0, earnType: 'miles', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://www.discover.com/credit-cards/travel/',
     promo: { points: 0, flatCash: 0, text: "Unlimited Mile Match at end of first year" },
@@ -341,6 +353,7 @@ const CARDS = [
   },
   {
     name: 'Discover it Cash Back',
+    issuer: 'Discover', imgUrl: 'https://placehold.co/240x152/000000/ffffff?text=Discover+Cash',
     fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://www.discover.com/credit-cards/cash-back/',
     promo: { points: 0, flatCash: 0, text: "Unlimited Cash Back Match at end of first year" },
@@ -357,6 +370,7 @@ const CARDS = [
   },
   {
     name: 'Chase Freedom Unlimited',
+    issuer: 'Chase', imgUrl: 'https://placehold.co/240x152/d3e2f2/117aca?text=Freedom+Unlimited',
     fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://creditcards.chase.com/cash-back-credit-cards/freedom/unlimited',
     promo: { points: 25000, flatCash: 0, text: "$250 bonus after $500 spend in 3 mos" },
@@ -373,6 +387,7 @@ const CARDS = [
   },
   {
     name: 'Chase Freedom Flex',
+    issuer: 'Chase', imgUrl: 'https://placehold.co/240x152/117aca/ffffff?text=Freedom+Flex',
     fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://creditcards.chase.com/cash-back-credit-cards/freedom/flex',
     promo: { points: 20000, flatCash: 0, text: "$200 bonus after $500 spend in 3 mos" },
@@ -389,6 +404,7 @@ const CARDS = [
   },
   {
     name: 'Amex Blue Cash Preferred',
+    issuer: 'American Express', imgUrl: 'https://placehold.co/240x152/002663/ffffff?text=Blue+Cash+Pref',
     fee: 95, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://www.americanexpress.com/us/credit-cards/card/blue-cash-preferred/',
     promo: { points: 25000, flatCash: 0, text: "$250 statement credit after $3k spend in 6 mos" },
@@ -405,6 +421,7 @@ const CARDS = [
   },
   {
     name: 'Amex Blue Cash Everyday',
+    issuer: 'American Express', imgUrl: 'https://placehold.co/240x152/ffffff/002663?text=Blue+Cash+Everyday',
     fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://www.americanexpress.com/us/credit-cards/card/blue-cash-everyday/',
     promo: { points: 20000, flatCash: 0, text: "$200 statement credit after $2k spend in 6 mos" },
@@ -421,6 +438,7 @@ const CARDS = [
   },
   {
     name: 'Citi Double Cash',
+    issuer: 'Citi', imgUrl: 'https://placehold.co/240x152/004b87/ffffff?text=Double+Cash',
     fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://www.citi.com/credit-cards/citi-double-cash-credit-card',
     promo: { points: 20000, flatCash: 0, text: "$200 cash back after $1,500 spend in 6 mos" },
@@ -437,6 +455,7 @@ const CARDS = [
   },
   {
     name: 'Capital One Savor Cash',
+    issuer: 'Capital One', imgUrl: 'https://placehold.co/240x152/e0a05a/ffffff?text=Savor',
     fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://www.capitalone.com/credit-cards/savor/',
     promo: { points: 25000, flatCash: 0, text: "$250 cash bonus after $500 spend in 3 mos" },
@@ -453,6 +472,7 @@ const CARDS = [
   },
   {
     name: 'Wells Fargo Active Cash',
+    issuer: 'Wells Fargo', imgUrl: 'https://placehold.co/240x152/b50012/ffffff?text=Active+Cash',
     fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://creditcards.wellsfargo.com/active-cash-credit-card/',
     promo: { points: 20000, flatCash: 0, text: "$200 cash rewards after $500 spend in 3 mos" },
@@ -469,6 +489,7 @@ const CARDS = [
   },
   {
     name: 'Chase Sapphire Reserve',
+    issuer: 'Chase', imgUrl: 'https://placehold.co/240x152/000000/ffffff?text=Sapphire+Reserve',
     fee: 795, earnType: 'points', pvCash: 0.01, pvPortal: 0.015, pvTransfer: 0.02,
     applyUrl: 'https://creditcards.chase.com/rewards-credit-cards/sapphire/reserve',
     promo: { points: 125000, flatCash: 0, text: "125,000 points after $6k spend in 3 mos" },
@@ -485,6 +506,7 @@ const CARDS = [
   },
   {
     name: 'American Express Platinum',
+    issuer: 'American Express', imgUrl: 'https://placehold.co/240x152/e0e1e2/000000?text=Amex+Platinum',
     fee: 895, earnType: 'points', pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.02,
     applyUrl: 'https://www.americanexpress.com/us/credit-cards/card/platinum/',
     promo: { points: 150000, flatCash: 0, text: "Up to 150k points after $8k spend in 6 mos" },
@@ -501,6 +523,7 @@ const CARDS = [
   },
   {
     name: 'American Express Business Platinum',
+    issuer: 'American Express', imgUrl: 'https://placehold.co/240x152/e0e1e2/000000?text=Biz+Platinum',
     fee: 695, earnType: 'points', pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.02,
     applyUrl: 'https://www.americanexpress.com/us/credit-cards/card/business-platinum/',
     promo: { points: 250000, flatCash: 0, text: "Up to 250k points after $20k spend in 3 mos" },
@@ -517,6 +540,7 @@ const CARDS = [
   },
   {
     name: 'American Express Business Gold',
+    issuer: 'American Express', imgUrl: 'https://placehold.co/240x152/d4af37/ffffff?text=Biz+Gold',
     fee: 375, earnType: 'points', pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.02,
     applyUrl: 'https://www.americanexpress.com/us/credit-cards/card/business-gold/',
     promo: { points: 150000, flatCash: 0, text: "Up to 150k points after $15k spend in 3 mos" },
@@ -533,6 +557,7 @@ const CARDS = [
   },
   {
     name: 'Capital One Venture X',
+    issuer: 'Capital One', imgUrl: 'https://placehold.co/240x152/002951/ffffff?text=Venture+X',
     fee: 395, earnType: 'miles', pvCash: 0.005, pvPortal: 0.01, pvTransfer: 0.02,
     applyUrl: 'https://www.capitalone.com/credit-cards/venture-x/',
     promo: { points: 75000, flatCash: 0, text: "75,000 miles after $4k spend in 3 mos" },
@@ -898,10 +923,13 @@ function buildDrawer(r, currentResult) {
 
   const promoHTML = r.promoValue > 0 
     ? `<div class="drawer-promo"><strong>Sign-on Promo:</strong> ${r.card.promo.text} <br><span style="opacity:0.8; margin-top:2px; display:inline-block;">(Valued at <strong>${fmt(r.promoValue)}</strong> using your ${currentStrategy} strategy at ${(r.activePv*100).toFixed(1)}¢/pt)</span></div>`
-    : `<div class="drawer-promo"><strong>Sign-on Promo:</strong> ${r.card.promo.text}</div>`;
+    : `<div class="drawer-promo" style="justify-content:center;"><strong>Sign-on Promo:</strong> ${r.card.promo.text}</div>`;
 
   return `
-  ${promoHTML}
+  <div class="drawer-header-row">
+    <img src="${r.card.imgUrl}" alt="Card Image" class="drawer-card-img">
+    ${promoHTML}
+  </div>
   <div class="drawer-inner">
     <div class="value-card hard">
       <div class="value-type">Hard value (Valued at ${(r.activePv * 100).toFixed(2)}¢/pt)</div>
@@ -1057,8 +1085,21 @@ function renderUI() {
     </div>`
   ).join('');
 
-  const cardOptions = '<option value="">— No current card —</option>' +
-    CARDS.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+  // Auto-group cards by issuer
+  const groupedCards = CARDS.reduce((acc, card) => {
+    if (!acc[card.issuer]) acc[card.issuer] = [];
+    acc[card.issuer].push(card);
+    return acc;
+  }, {});
+  
+  let cardOptions = '<option value="">— No current card —</option>';
+  Object.keys(groupedCards).sort().forEach(issuer => {
+    cardOptions += `<optgroup label="${issuer}">`;
+    groupedCards[issuer].forEach(c => {
+      cardOptions += `<option value="${c.name}">${c.name}</option>`;
+    });
+    cardOptions += `</optgroup>`;
+  });
 
   document.getElementById('app').innerHTML = `
     <div class="section-label">Your profile — click to load a starting point</div>
