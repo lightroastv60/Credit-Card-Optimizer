@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Card Optimizer</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #F5F2EC; --card: #FDFAF5; --ink: #1A1A18; --ink2: #5A5A52; --ink3: #9A9A8E;
+  --accent: #2D5A3D; --accent-light: #E8F0EB; --amber: #C8721A; --amber-light: #FEF3E2;
+  --hard: #1E3A5F; --hard-light: #E8EEF5; --soft: #5A3060; --soft-light: #F0EAF5;
+  --border: #E0DDD4; --sub-bg: #F2EEE5; --radius: 12px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+}
+body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; padding: 32px 20px 60px; }
+.page { max-width: 860px; margin: 0 auto; }
+
+.header { margin-bottom: 36px; }
+.header h1 { font-family: 'DM Serif Display', serif; font-size: 36px; line-height: 1.15; letter-spacing: -0.5px; }
+.header h1 em { font-style: italic; color: var(--accent); }
+.header p { margin-top: 8px; font-size: 15px; color: var(--ink2); max-width: 520px; line-height: 1.6; }
+
+.section-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink3); margin-bottom: 12px; }
+
+/* PROFILES */
+.profiles { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 24px; }
+.profile-btn { background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 16px 14px; cursor: pointer; transition: all 0.18s; text-align: left; box-shadow: var(--shadow); }
+.profile-btn:hover { border-color: var(--accent); transform: translateY(-1px); }
+.profile-btn.active { border-color: var(--accent); background: var(--accent-light); box-shadow: 0 0 0 3px rgba(45,90,61,0.1), var(--shadow); }
+.profile-letter { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--accent); line-height: 1; margin-bottom: 6px; }
+.profile-name { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+.profile-desc { font-size: 11px; color: var(--ink3); line-height: 1.4; }
+.profile-total { margin-top: 10px; font-family: 'DM Mono', monospace; font-size: 13px; color: var(--accent); font-weight: 500; }
+
+/* REDEMPTION STRATEGY */
+.strategy-panel { background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 28px; box-shadow: var(--shadow); }
+.strategy-controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.strat-label { display: block; position: relative; cursor: pointer; }
+.strat-label input { position: absolute; opacity: 0; width: 0; height: 0; }
+.strat-box { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 12px 8px; border: 1.5px solid var(--border); border-radius: 8px; transition: all 0.2s; height: 100%; }
+.strat-box:hover { border-color: var(--accent); background: #fcfcfc; }
+.strat-label input:checked + .strat-box { border-color: var(--accent); background: var(--accent-light); box-shadow: 0 1px 4px rgba(45,90,61,0.15); }
+.strat-title { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+.strat-desc { font-size: 10px; color: var(--ink2); line-height: 1.3; }
+
+/* SPEND PANEL */
+.spend-panel { background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow); }
+.spend-panel-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px; }
+.total-year { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--ink2); }
+.total-year span { font-size: 18px; color: var(--ink); font-weight: 500; }
+
+/* CATEGORY GROUPS */
+.cat-group { border-bottom: 1px solid var(--border); }
+.cat-group:last-child { border-bottom: none; }
+.category { display: grid; grid-template-columns: 180px 1fr 96px 28px; align-items: center; gap: 12px; padding: 12px 0; }
+.cat-label { font-size: 13px; font-weight: 500; color: var(--ink); display: flex; align-items: center; gap: 7px; }
+.cat-icon { font-size: 15px; line-height: 1; }
+.cat-val-wrap { text-align: right; }
+.cat-value { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--ink); font-weight: 500; }
+.cat-annual { font-size: 10px; color: var(--ink3); margin-top: 1px; }
+
+input[type=range] { -webkit-appearance: none; width: 100%; height: 4px; border-radius: 2px; background: var(--border); outline: none; cursor: pointer; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); border: 2.5px solid white; box-shadow: 0 1px 4px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.12s; }
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.18); }
+
+.expand-btn { width: 24px; height: 24px; background: none; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; color: var(--ink3); font-size: 9px; display: flex; align-items: center; justify-content: center; transition: all 0.18s; flex-shrink: 0; }
+.expand-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+.expand-btn.open { border-color: var(--accent); color: var(--accent); background: var(--accent-light); transform: rotate(90deg); }
+
+.sub-rows { overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
+.sub-rows.open { max-height: 400px; }
+.sub-row { display: grid; grid-template-columns: 180px 1fr 96px 28px; align-items: center; gap: 12px; padding: 10px 24px 10px 48px; margin: 0 -24px; background: var(--sub-bg); border-top: 1px solid var(--border); }
+.sub-row:last-child { border-bottom: 1px solid var(--border); margin-bottom: -1px; }
+.sub-label { font-size: 12px; color: var(--ink2); display: flex; align-items: center; gap: 6px; }
+.sub-value { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--amber); font-weight: 500; text-align: right; }
+.sub-annual { font-size: 10px; color: var(--ink3); text-align: right; margin-top: 1px; }
+.sub-row input[type=range]::-webkit-slider-thumb { background: var(--amber); }
+
+/* ALLOCATION REMAINDER ROW */
+.base-row { background: transparent; border-top: 1.5px dashed var(--border) !important; }
+.base-row .sub-label { color: var(--ink); font-weight: 500; }
+.base-row .sub-value { color: var(--ink); }
+.base-bar-placeholder { border-bottom: 1.5px dotted var(--ink3); opacity: 0.3; margin: 0 10px; }
+
+/* LIFESTYLE PANEL (EXPANDABLE) */
+.lifestyle-panel { background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 0; margin-bottom: 24px; box-shadow: var(--shadow); }
+.lifestyle-header { padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; transition: background 0.2s; border-radius: var(--radius); }
+.lifestyle-header:hover { background: var(--accent-light); }
+.lifestyle-header:hover .section-label { color: var(--accent); }
+.lifestyle-chevron { font-size: 12px; color: var(--ink3); transition: transform 0.35s ease; flex-shrink: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); border-radius: 6px; }
+.lifestyle-panel.open .lifestyle-chevron { transform: rotate(180deg); border-color: var(--accent); color: var(--accent); background: white; }
+.lifestyle-content { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 0 24px; }
+.lifestyle-panel.open .lifestyle-content { max-height: 1200px; padding-bottom: 20px; }
+.lifestyle-content-inner { border-top: 1px solid var(--border); padding-top: 12px; }
+
+.toggle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid var(--border); gap: 12px; }
+.toggle-row:nth-last-child(-n+2) { border-bottom: none; }
+.toggle-label-wrap { flex: 1; }
+.toggle-label { font-size: 13px; font-weight: 500; color: var(--ink); }
+.toggle-sub { font-size: 11px; color: var(--ink3); margin-top: 2px; line-height: 1.4; }
+.toggle { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
+.toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-track { position: absolute; inset: 0; background: var(--border); border-radius: 10px; cursor: pointer; transition: background 0.2s; }
+.toggle input:checked + .toggle-track { background: var(--accent); }
+.toggle-track::after { content: ''; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; background: white; border-radius: 50%; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+.toggle input:checked + .toggle-track::after { transform: translateX(16px); }
+
+/* STEPPER */
+.stepper-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid var(--border); }
+.stepper-controls { display: flex; align-items: center; gap: 10px; }
+.stepper-btn { width: 28px; height: 28px; border: 1.5px solid var(--border); border-radius: 6px; background: none; cursor: pointer; font-size: 16px; color: var(--ink2); display: flex; align-items: center; justify-content: center; transition: all 0.15s; line-height: 1; }
+.stepper-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+.stepper-val { font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 500; color: var(--ink); min-width: 28px; text-align: center; }
+
+/* CURRENT CARD */
+.current-card-select { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
+.current-card-select label { font-size: 13px; color: var(--ink2); white-space: nowrap; }
+.current-card-select select { flex: 1; font-family: 'Instrument Sans', sans-serif; font-size: 13px; padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--card); color: var(--ink); cursor: pointer; outline: none; }
+.current-card-select select:focus { border-color: var(--accent); }
+
+/* RECS + DRAWER */
+.rec-wrap { margin-bottom: 10px; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+.rec-card { background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; transition: border-color 0.15s; cursor: pointer; user-select: none; }
+.rec-wrap.open .rec-card { border-radius: var(--radius) var(--radius) 0 0; border-bottom-color: transparent; border-color: var(--accent); }
+.rec-card:hover { border-color: var(--accent); }
+.rec-card.top { border-color: var(--accent); background: var(--accent-light); }
+.rec-rank { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--ink3); width: 28px; flex-shrink: 0; }
+.rec-card.top .rec-rank, .rec-wrap.open .rec-rank { color: var(--accent); }
+.rec-info { flex: 1; padding: 0 12px; min-width: 0; }
+.rec-name { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rec-why { font-size: 11px; color: var(--ink2); margin-top: 2px; line-height: 1.4; }
+
+/* HORIZONTAL VALUE SUMMARY (NEW) */
+.rec-value { text-align: right; flex-shrink: 0; display: flex; align-items: center; gap: 12px; }
+.rec-summary { display: grid; grid-template-columns: 50px 50px 65px; gap: 16px; border-right: 1px solid var(--border); padding-right: 16px; margin-right: 8px; }
+.rec-stat { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; }
+.rec-stat-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink3); margin-bottom: 2px; }
+.rec-stat-label.hard-label { color: var(--hard); }
+.rec-stat-label.soft-label { color: var(--soft); }
+.rec-stat-num { font-family: 'DM Mono', monospace; font-size: 14px; color: var(--ink); font-weight: 500; }
+.rec-stat.total .rec-stat-num { font-size: 16px; color: var(--accent); font-weight: 600; }
+.rec-nums { width: 80px; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; }
+.rec-delta { font-size: 11px; color: var(--ink3); text-align: right; }
+.rec-delta.positive { color: #2D7A3D; }
+.rec-chevron { font-size: 11px; color: var(--ink3); transition: transform 0.22s; flex-shrink: 0; }
+.rec-wrap.open .rec-chevron { transform: rotate(180deg); color: var(--accent); }
+.rec-type-badge { display: inline-block; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 5px; border-radius: 4px; margin-left: 5px; vertical-align: middle; }
+.badge-points { background: #E8EEF5; color: var(--hard); }
+.badge-miles { background: #FEF3E2; color: var(--amber); }
+.badge-cash { background: #E8F0EB; color: var(--accent); }
+
+/* DRAWER */
+.rec-drawer { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; background: var(--card); border: 1.5px solid var(--accent); border-top: none; border-radius: 0 0 var(--radius) var(--radius); }
+.rec-wrap.open .rec-drawer { max-height: 800px; }
+.drawer-inner { padding: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.value-card { border-radius: 8px; padding: 16px; border: 1.5px solid transparent; }
+.value-card.hard { background: var(--hard-light); border-color: rgba(30,58,95,0.15); }
+.value-card.soft { background: var(--soft-light); border-color: rgba(90,48,96,0.12); }
+.value-type { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
+.hard .value-type { color: var(--hard); } .soft .value-type { color: var(--soft); }
+.value-amount { font-family: 'DM Serif Display', serif; font-size: 30px; line-height: 1; margin-bottom: 4px; letter-spacing: -0.5px; }
+.hard .value-amount { color: var(--hard); } .soft .value-amount { color: var(--soft); }
+.value-desc { font-size: 11px; line-height: 1.5; margin-bottom: 4px; }
+.hard .value-desc { color: #4A6A8A; } .soft .value-desc { color: #7A5A85; }
+.value-items { margin-top: 8px; display: flex; flex-direction: column; gap: 1px; }
+.value-item { font-size: 11px; display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
+.value-item:last-child { border-bottom: none; }
+.hard .value-item { color: #3A5A7A; } .soft .value-item { color: #6A4A75; }
+.value-item-num { font-family: 'DM Mono', monospace; font-weight: 500; }
+.value-item.total-line { font-weight: 600; padding-top: 6px; margin-top: 2px; border-top: 1px solid rgba(30,58,95,0.15) !important; border-bottom: none; }
+.hard .value-item.total-line { color: var(--hard); }
+.drawer-notes { padding: 0 18px 14px; font-size: 11px; color: var(--ink3); font-style: italic; line-height: 1.5; }
+.drawer-total { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; background: var(--accent-light); border-top: 1px solid rgba(45,90,61,0.2); }
+.drawer-total-label { font-size: 12px; color: var(--ink2); }
+.drawer-total-label strong { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--ink); display: block; letter-spacing: -0.3px; margin-top: 1px; }
+.switch-badge { display: inline-block; background: var(--accent); color: white; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+.fade-up { animation: fadeUp 0.28s ease forwards; }
+
+@media (max-width: 600px) {
+  .profiles { grid-template-columns: 1fr; }
+  .strategy-controls { grid-template-columns: 1fr; }
+  .toggle-grid { grid-template-columns: 1fr; }
+  .drawer-inner { grid-template-columns: 1fr; }
+  .category, .sub-row { grid-template-columns: 130px 1fr 76px 24px; }
+  .header h1 { font-size: 26px; }
+  
+  /* Mobile adjustments for horizontal stats */
+  .rec-summary { grid-template-columns: 45px 45px 55px; gap: 8px; padding-right: 10px; margin-right: 4px; }
+  .rec-stat-num { font-size: 12px; }
+  .rec-stat.total .rec-stat-num { font-size: 14px; }
+  .rec-nums { width: 60px; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <h1>What's your card <em>actually</em> worth?</h1>
+    <p>Dial in your real spending and lifestyle. We'll calculate hard rewards and soft value for every card — then rank them for you.</p>
+  </div>
+  <div id="app"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// CARD DATABASE (20 Cards - Multi-tiered Redemption Values)
+// ═══════════════════════════════════════════════════════════════════
+const CARDS = [
+  {
+    name: 'Chase Sapphire Preferred',
+    fee: 95, earnType: 'points', 
+    pvCash: 0.01, pvPortal: 0.0125, pvTransfer: 0.02,
+    rates: {
+      grocery_instore:  [{rate:3,cap:null}], grocery_online:   [{rate:3,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
+      dining:           [{rate:3,cap:null}], delivery:         [{rate:3,cap:null}],
+      travel_portal:    [{rate:5,cap:null}], travel_direct:    [{rate:2,cap:null}],
+      gas:              [{rate:1,cap:null}], transit:          [{rate:1,cap:null}],
+      drugstore:        [{rate:1,cap:null}], other:            [{rate:1,cap:null}],
+    },
+    credits: { travel:50, doordash:120 },
+    lounge: false, tsaYears: 0, cellProtect: 0, anniversaryPct: 0.10, anniversaryFlat: 0,
+    notes: 'Grocery 3x applies to online grocery only. $50 hotel credit via Chase Travel portal. DashPass requires activation.',
+  },
+  {
+    name: 'American Express Gold Card',
+    fee: 325, earnType: 'points', 
+    pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.02,
+    rates: {
+      grocery_instore:  [{rate:4,cap:25000},{rate:1,cap:null}], grocery_online:   [{rate:1,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
+      dining:           [{rate:4,cap:50000},{rate:1,cap:null}], delivery:         [{rate:4,cap:null}],
+      travel_portal:    [{rate:3,cap:null}], travel_direct:    [{rate:3,cap:null}],
+      gas:              [{rate:1,cap:null}], transit:          [{rate:1,cap:null}],
+      drugstore:        [{rate:1,cap:null}], other:            [{rate:1,cap:null}],
+    },
+    credits: { dining:120, uber:120, resy_dunkin:184 },
+    lounge: false, tsaYears: 0, cellProtect: 0, anniversaryPct: 0, anniversaryFlat: 0,
+    notes: 'Warning: 0.6¢ cash back rate drastically hurts value if not booking travel. Activation required for all credits.',
+  },
+  {
+    name: 'Capital One Venture',
+    fee: 95, earnType: 'miles', 
+    pvCash: 0.005, pvPortal: 0.01, pvTransfer: 0.02,
+    rates: {
+      grocery_instore:  [{rate:2,cap:null}], grocery_online:   [{rate:2,cap:null}], grocery_wholesale:[{rate:2,cap:null}],
+      dining:           [{rate:2,cap:null}], delivery:         [{rate:2,cap:null}],
+      travel_portal:    [{rate:5,cap:null}], travel_direct:    [{rate:2,cap:null}],
+      gas:              [{rate:2,cap:null}], transit:          [{rate:2,cap:null}],
+      drugstore:        [{rate:2,cap:null}], other:            [{rate:2,cap:null}],
+    },
+    credits: { tsa:30 },
+    lounge: false, tsaYears: 4, cellProtect: 0, anniversaryPct: 0, anniversaryFlat: 0,
+    notes: 'Warning: Cap1 Miles are only worth 0.5¢ for statement credits. $120 TSA PreCheck credit every 4 years.',
+  },
+  {
+    name: 'Citi Strata Premier',
+    fee: 95, earnType: 'points', 
+    pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.02,
+    rates: {
+      grocery_instore:  [{rate:3,cap:null}], grocery_online:   [{rate:3,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
+      dining:           [{rate:3,cap:null}], delivery:         [{rate:3,cap:null}],
+      travel_portal:    [{rate:10,cap:null}], travel_direct:    [{rate:3,cap:null}],
+      gas:              [{rate:3,cap:null}], transit:          [{rate:1,cap:null}],
+      drugstore:        [{rate:1,cap:null}], other:            [{rate:1,cap:null}],
+    },
+    credits: { hotel:100 },
+    lounge: false, tsaYears: 0, cellProtect: 0, anniversaryPct: 0, anniversaryFlat: 0,
+    notes: '$100 hotel benefit on single stay $500+ via Citi Travel portal. 10x on portal hotels/cars.',
+  },
+  {
+    name: 'Wells Fargo Autograph',
+    fee: 0, earnType: 'points', 
+    pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.015,
+    rates: {
+      grocery_instore:  [{rate:1,cap:null}], grocery_online:   [{rate:1,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
+      dining:           [{rate:3,cap:null}], delivery:         [{rate:3,cap:null}],
+      travel_portal:    [{rate:3,cap:null}], travel_direct:    [{rate:3,cap:null}],
+      gas:              [{rate:3,cap:null}], transit:          [{rate:3,cap:null}],
+      drugstore:        [{rate:1,cap:null}], other:            [{rate:1,cap:null}],
+    },
+    credits: {},
+    lounge: false, tsaYears: 0, cellProtect: 600, anniversaryPct: 0, anniversaryFlat: 0,
+    notes: 'No annual fee. 3x on streaming and phone plans. $600 cell phone protection.',
+  },
+  {
+    name: 'Bank of America Travel Rewards',
+    fee: 0, earnType: 'points', 
+    pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.01,
+    rates: {
+      grocery_instore:  [{rate:1.5,cap:null}], grocery_online:   [{rate:1.5,cap:null}], grocery_wholesale:[{rate:1.5,cap:null}],
+      dining:           [{rate:1.5,cap:null}], delivery:         [{rate:1.5,cap:null}],
+      travel_portal:    [{rate:1.5,cap:null}], travel_direct:    [{rate:1.5,cap:null}],
+      gas:              [{rate:1.5,cap:null}], transit:          [{rate:1.5,cap:null}],
+      drugstore:        [{rate:1.5,cap:null}], other:            [{rate:1.5,cap:null}],
+    },
+    credits: {},
+    lounge: false, tsaYears: 0, cellProtect: 0, anniversaryPct: 0, anniversaryFlat: 0,
+    notes: 'Flat 1.5 points on all purchases. Best used for travel statement credits.'
+  },
+  {
+    name: 'Discover it Miles',
+    fee: 0, earnType: 'miles', 
+    pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    rates: {
+      grocery_instore:  [{rate:1.5,cap:null}], grocery_online:   [{rate:1.5,cap:null}], grocery_wholesale:[{rate:1.5,cap:null}],
+      dining:           [{rate:1.5,cap:null}], delivery:         [{rate:1.5,cap:null}],
+      travel_portal:    [{rate:1.5,cap:null}], travel_direct:    [{rate:1.5,cap:null}],
+      gas:              [{rate:1.5,cap:null}], transit:          [{rate:1.5,cap:null}],
+      drugstore:        [{rate:1.5,cap:null}], other:            [{rate:1.5,cap:null}],
+    },
+    credits: {},
+    lounge: false, tsaYears: 0, cellProtect: 0, anniversaryPct: 0, anniversaryFlat: 0,
+    notes: 'Flat 1.5x miles everywhere. First year miles matched (not factored into recurring annual model).'
+  },
+  {
+    name: 'Discover it Cash Back',
+    fee: 0, earnType: 'cash', 
+    pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    rates: {
+      grocery_instore:  [{rate:1,cap:null}], grocery_online:   [{rate:1,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
+      dining:           [{rate:1,cap:null}], delivery:         [{rate:1,cap:null}],
+      travel_portal:    [{rate:1,cap:null}], travel_direct:    [{rate:1,cap:null}],
+      gas:              [{rate:1,cap:null}], transit:          [{rate:1,cap:null}],
+      drugstore:        [{rate:1,cap:null}], other:            [{rate:1,cap:null}],
+    },
+    credits: {},
+    lounge: false, tsaYears: 0, cellProtect: 0, anniversaryPct: 0, anniversaryFlat: 0,
+    notes: '5% cash back on rotating quarterly categories (modeled here at base 1%).'
+  },
+  {
+    name: 'Chase Freedom Unlimited',
+    fee: 0, earnType: 'cash', 
+    pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    rates: {
+      grocery_instore:  [{rate:1.5,cap:null}], grocery_online:   [{rate:1.5,cap:null}], grocery_wholesale:[{rate:1.5,cap:null}],
+      dining:           [{rate:3,cap:null}], delivery:         [{rate:3,cap:null}],
+      travel_portal:    [{rate:5,cap:null}], travel_direct:    [{rate:1.5,cap:null}],
+      gas:              [{rate:1.5,cap:null}], transit:          [{rate:1.5,cap:null}],
+      drugstore:        [{rate:3,cap:null}], other:            [{rate:1.5,cap:null}],
+    },
+    credits: {},
+    lounge: false, tsaYears: 0, cellProtect: 0, anniversaryPct: 0, anniversaryFlat: 0,
+    notes: 'Earns cash back. (Can be pooled with Sapphire cards for transfer multipliers, but evaluated here standalone).',
+  },
+  {
+    name: 'Chase Freedom Flex',
+    fee: 0, earnType: 'cash', 
+    pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    rates: {
+      grocery_instore:  [{rate:1,cap:null}], grocery_online:   [{rate:1,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
+      dining:           [{rate:3,cap:null}], delivery:         [{rate:3,cap:null}],
+      travel_portal:    [{rate:5,cap:null}], travel_direct:    [{rate:1,cap:null}],
+      gas:              [{rate:1,cap:null}], transit:          [{rate:1,cap:null}],
+      drugstore:        [{rate:3,cap:null}], other:            [{rate:1,cap:null}],
+    },
+    credits: {},
+    lounge: false, tsaYears: 0, cellProtect: 800, anniversaryPct: 0, anniversaryFlat: 0,
+    notes: 'Rotating 5x categories not modeled. $800 cell protection.',
+  },
+  {
+    name: 'Amex Blue Cash Preferred',
+    fee: 95, earnType: 'cash', 
+    pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    rates: {
+      grocery_instore:  [{rate:6,cap:6000},{rate:1,cap:null}], grocery_online:   [{rate:1,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
+      dining:           [{rate:1,cap:null}], delivery:         [{rate:1,cap:null}],
+      travel_portal:    [{rate:1,cap:null}], travel_direct:    [{rate:1,cap:null}],
+      gas:              [{rate:3,cap:null}], transit:          [{rate:3,cap:null}],
+      drugstore:        [{rate:1,cap:null}], other:            [{rate:1,cap:null}],
+    },
+    credits: { streaming:84 },
+    lounge: false, tsaYears: 0, cellProtect: 0, anniversaryPct: 0, anniversaryFlat: 0,
+    notes: '6% grocery capped at $6k/yr. $84 Disney Bundle credit (activation required).',
+  },
+  {
+    name: 'Amex Blue Cash Everyday',
+    fee: 0, earnType: 'cash', 
+    pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    rates: {
+      grocery_instore:  [{rate:3,cap:6000},{rate:1,cap:null}], grocery_online:   [{rate:3,cap:6000},{rate:1,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
+      dining:           [{rate:1,cap:null}], delivery:         [{rate:1,cap:null}],
+      travel_portal:    [{rate:1,cap:null}], travel_direct:    [{rate:1,cap:null}],
+      gas:              [{rate:3,cap:6000},{rate:1,cap:null}], transit:          [{rate:1,cap:null}],
+      drugstore:        [{rate:1,cap:null}], other:            [{rate:1,cap:null}],
+    },
+    credits: { streaming:84, mealkit:180 },
+    lounge: false, tsaYears: 0, cellProtect: 0, anniversaryPct: 0, anniversaryFlat: 0,
+    notes: 'No annual fee. $84 Disney Bundle + $180 Home Chef credits (activation required).',
+  },
+  {
+    name: 'Citi Double Cash',
+    fee: 0, earnType: 'cash', 
+    pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    rates: {
+      grocery_instore:  [{rate:2,cap:null}], grocery_online:   [{rate:2,cap:null}], grocery_wholesale:[{rate:2,cap:null}],
+      dining:           [{rate:2,cap:null}], delivery:         [{rate:2,cap:null}],
+      travel_portal:    [{rate:2,cap:null}], travel_direct:    [{rate:2,cap:null}],
+      gas:              [{rate:2,cap:null}], transit:          [{rate:2,cap:null}],
+      drugstore:        [{rate:2,cap:null}], other:            [{rate:2,cap:null}],
+    },
+    credits: {},
+    lounge: false, tsaYears: 0, cellProtect: 0, anniversaryPct: 0, anniversaryFlat: 0,
+    notes: '2% on everything (1% when you buy + 1% when you pay). No frills, no credits.',
+  },
+  {
+    name: 'Capital One Savor Cash',
+    fee: 0, earnType: 'cash', 
+    pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    rates: {
+      grocery_instore:  [{rate:3,cap:null}], grocery_online:   [{rate:3,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
+      dining:           [{rate:3,cap:null}], delivery:         [{rate:3,cap:null}],
+      travel_portal:    [{rate:1,cap:null}], travel_direct:    [{rate:1,cap:null}],
+      gas:              [{rate:1,cap:null}], transit:          [{rate:1,cap:null}],
+      drugstore:        [{rate:1,cap:null}], other:            [{rate:1,cap:null}],
+    },
+    credits: {},
+    lounge: false, tsaYears: 0, cellProtect: 0, anniversaryPct: 0, anniversaryFlat: 0,
+    notes: 'No annual fee. 3x on dining, grocery, and entertainment. Excludes wholesale clubs.',
+  },
+  {
+    name: 'Wells Fargo Active Cash',
+    fee: 0, earnType: 'cash', 
+    pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    rates: {
+      grocery_instore:  [{rate:2,cap:null}], grocery_online:   [{rate:2,cap:null}], grocery_wholesale:[{rate:2,cap:null}],
+      dining:           [{rate:2,cap:null}], delivery:         [{rate:2,cap:null}],
+      travel_portal:    [{rate:2,cap:null}], travel_direct:    [{rate:2,cap:null}],
+      gas:              [{rate:2,cap:null}], transit:          [{rate:2,cap:null}],
+      drugstore:        [{rate:2,cap:null}], other:            [{rate:2,cap:null}],
+    },
+    credits: {},
+    lounge: false, tsaYears: 0, cellProtect: 600, anniversaryPct: 0, anniversaryFlat: 0,
+    notes: 'Flat 2% on everything. $600 cell phone protection.',
+  },
+  {
+    name: 'Chase Sapphire Reserve',
+    fee: 795, earnType: 'points', 
+    pvCash: 0.01, pvPortal: 0.015, pvTransfer: 0.02,
+    rates: {
+      grocery_instore:  [{rate:1,cap:null}], grocery_online:   [{rate:1,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
+      dining:           [{rate:3,cap:null}], delivery:         [{rate:3,cap:null}],
+      travel_portal:    [{rate:8,cap:null}], travel_direct:    [{rate:4,cap:null}],
+      gas:              [{rate:1,cap:null}], transit:          [{rate:1,cap:null}],
+      drugstore:        [{rate:1,cap:null}], other:            [{rate:1,cap:null}],
+    },
+    credits: { travel:300, dining:300, boutique:500, stubhub:300, apple:250, doordash:120, tsa:30 },
+    lounge: true, tsaYears: 4, cellProtect: 0, anniversaryPct: 0, anniversaryFlat: 0,
+    notes: 'Major 2026 update: $795 fee. Guaranteed 1.5¢ portal rate makes this a powerhouse for direct travel bookings.',
+  },
+  {
+    name: 'American Express Platinum',
+    fee: 895, earnType: 'points', 
+    pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.02,
+    rates: {
+      grocery_instore:  [{rate:1,cap:null}], grocery_online:   [{rate:1,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
+      dining:           [{rate:1,cap:null}], delivery:         [{rate:1,cap:null}],
+      travel_portal:    [{rate:5,cap:null}], travel_direct:    [{rate:5,cap:500000},{rate:1,cap:null}],
+      gas:              [{rate:1,cap:null}], transit:          [{rate:1,cap:null}],
+      drugstore:        [{rate:1,cap:null}], other:            [{rate:1,cap:null}],
+    },
+    credits: { airline:200, boutique:200, uber:200, digital:300, tsa:30, clear:209, retail:255 },
+    lounge: true, tsaYears: 4, cellProtect: 800, anniversaryPct: 0, anniversaryFlat: 0,
+    notes: 'Warning: 0.6¢ cash back rate drastically hurts value if not booking travel. Massive $895 fee offset by heavy lifestyle credits.',
+  },
+  {
+    name: 'American Express Business Platinum',
+    fee: 695, earnType: 'points', 
+    pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.02,
+    rates: {
+      grocery_instore:  [{rate:1,cap:null}], grocery_online:   [{rate:1,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
+      dining:           [{rate:1,cap:null}], delivery:         [{rate:1,cap:null}],
+      travel_portal:    [{rate:5,cap:null}], travel_direct:    [{rate:1,cap:null}],
+      gas:              [{rate:1,cap:null}], transit:          [{rate:1,cap:null}],
+      drugstore:        [{rate:1,cap:null}], other:            [{rate:1,cap:null}],
+    },
+    credits: { airline:200, clear:189, retail:400 },
+    lounge: true, tsaYears: 4, cellProtect: 800, anniversaryPct: 0, anniversaryFlat: 0,
+    notes: '5x on flights/hotels via AmexTravel. $400 Dell credit and $200 Airline fee credit. Centurion Lounge access.'
+  },
+  {
+    name: 'American Express Business Gold',
+    fee: 375, earnType: 'points', 
+    pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.02,
+    rates: {
+      grocery_instore:  [{rate:1,cap:null}], grocery_online:   [{rate:1,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
+      dining:           [{rate:4,cap:150000},{rate:1,cap:null}], delivery:         [{rate:4,cap:null}],
+      travel_portal:    [{rate:1,cap:null}], travel_direct:    [{rate:1,cap:null}],
+      gas:              [{rate:4,cap:150000},{rate:1,cap:null}], transit:          [{rate:1,cap:null}],
+      drugstore:        [{rate:1,cap:null}], other:            [{rate:1,cap:null}],
+    },
+    credits: { retail:395 },
+    lounge: false, tsaYears: 0, cellProtect: 800, anniversaryPct: 0, anniversaryFlat: 0,
+    notes: 'Earns 4x on top two categories (modeled here as dining and gas). $240 flexible business credit and Walmart+ credit.'
+  },
+  {
+    name: 'Capital One Venture X',
+    fee: 395, earnType: 'miles', 
+    pvCash: 0.005, pvPortal: 0.01, pvTransfer: 0.02,
+    rates: {
+      grocery_instore:  [{rate:2,cap:null}], grocery_online:   [{rate:2,cap:null}], grocery_wholesale:[{rate:2,cap:null}],
+      dining:           [{rate:2,cap:null}], delivery:         [{rate:2,cap:null}],
+      travel_portal:    [{rate:10,cap:null}], travel_direct:    [{rate:2,cap:null}],
+      gas:              [{rate:2,cap:null}], transit:          [{rate:2,cap:null}],
+      drugstore:        [{rate:2,cap:null}], other:            [{rate:2,cap:null}],
+    },
+    credits: { travel:300, tsa:30 },
+    lounge: true, tsaYears: 4, cellProtect: 800, anniversaryPct: 0, anniversaryFlat: 10000,
+    notes: '$300 travel credit via portal. 10,000 anniversary miles. Cap1 Miles are only worth 0.5¢ for statement credits.',
+  },
+];
+
+// ═══════════════════════════════════════════════════════════════════
+// ALLOCATION SPEND INPUTS (Master -> Subs -> Remainder)
+// ═══════════════════════════════════════════════════════════════════
+const SPEND_GROUPS = [
+  {
+    id: 'groceries', icon: '🛒',
+    main: { key: 'grocery_total', label: 'Total Groceries', max: 2000, step: 50 },
+    baseKey: 'grocery_instore', baseLabel: 'In-store (Remainder)',
+    subs: [
+      { key: 'grocery_online', label: 'Online / Delivery', icon: '📦' },
+      { key: 'grocery_wholesale', label: 'Wholesale clubs', icon: '🏭' }
+    ]
+  },
+  {
+    id: 'dining', icon: '🍽',
+    main: { key: 'dining_total', label: 'Total Dining', max: 1500, step: 25 },
+    baseKey: 'dining', baseLabel: 'Restaurants (Remainder)',
+    subs: [
+      { key: 'delivery', label: 'Food delivery apps', icon: '🛵' }
+    ]
+  },
+  {
+    id: 'travel', icon: '✈️',
+    main: { key: 'travel_total', label: 'Total Travel', max: 3000, step: 50 },
+    baseKey: 'travel_direct', baseLabel: 'Booked Direct (Remainder)',
+    subs: [
+      { key: 'travel_portal', label: 'Booked via portal', icon: '🌐' }
+    ]
+  },
+  {
+    id: 'gas_transit', icon: '🚗',
+    main: { key: 'gas_transit_total', label: 'Total Auto & Transit', max: 1000, step: 25 },
+    baseKey: 'gas', baseLabel: 'Gas / EV (Remainder)',
+    subs: [
+      { key: 'transit', label: 'Transit & rideshare', icon: '🚌' }
+    ]
+  },
+  {
+    id: 'other', icon: '🛍',
+    main: { key: 'other_total', label: 'Total Retail & Other', max: 3000, step: 50 },
+    baseKey: 'other', baseLabel: 'General spend (Remainder)',
+    subs: [
+      { key: 'drugstore', label: 'Drugstores (CVS, etc.)', icon: '💊' }
+    ]
+  }
+];
+
+const TOGGLES = [
+  { key: 'useDoorDash',    label: 'Use DoorDash / Uber Eats',      sub: 'Values DashPass credits (~$120/yr)' },
+  { key: 'useUber',        label: 'Use Uber / rideshare regularly', sub: 'Values Uber Cash credits on Amex cards' },
+  { key: 'wantStreaming',  label: 'Use streaming subscriptions',    sub: 'Values Disney Bundle / digital credits' },
+  { key: 'useMealKits',    label: 'Use meal kit delivery',         sub: 'Values Amex BCE $180 Home Chef credit' },
+  { key: 'useClear',       label: 'Use CLEAR Plus',                sub: 'Values Amex Plat $209 credit' },
+  { key: 'useRetailCredits',label: 'Use niche retail credits',      sub: 'Values Walmart+ & Saks Fifth Avenue' },
+  { key: 'useApple',       label: 'Use Apple TV/Music',            sub: 'Values new CSR $250 Apple credit' },
+  { key: 'useStubHub',     label: 'Buy tickets on StubHub',        sub: 'Values new CSR $300 StubHub credit' },
+  { key: 'useBoutique',    label: 'Stay at luxury/boutique hotels',sub: 'Values Amex FHR & CSR "The Edit" credits' },
+  { key: 'useResyDunkin',  label: 'Eat at Resy/Dunkin locations',  sub: 'Values Amex Gold Resy/Dunkin credits' },
+  { key: 'intlTravel',     label: 'Travel internationally',         sub: 'Highlights no-FX-fee advantage' },
+  { key: 'hasLounge',      label: 'Use airport lounges',            sub: 'Values Priority Pass / Centurion access' },
+  { key: 'wantCellProtect',label: 'Want cell phone protection',     sub: 'Values $600–$800 coverage benefit' },
+];
+
+const PROFILES = {
+  A: {
+    spend: { grocery_total:200, grocery_online:0, grocery_wholesale:0, dining_total:100, delivery:0, travel_total:50, travel_portal:0, gas_transit_total:100, transit:0, other_total:175, drugstore:25 },
+    trips: 2, toggles: { useDoorDash:true, useUber:true, intlTravel:true, hasLounge:true, wantStreaming:true, wantCellProtect:true, useApple:true, useStubHub:true, useBoutique:true, useResyDunkin:true, useMealKits:true, useClear:true, useRetailCredits:true },
+    label:'Just the essentials', desc:'Single or couple, modest spend'
+  },
+  B: {
+    spend: { grocery_total:700, grocery_online:100, grocery_wholesale:0, dining_total:350, delivery:50, travel_total:200, travel_portal:0, gas_transit_total:200, transit:50, other_total:300, drugstore:50 },
+    trips: 4, toggles: { useDoorDash:true, useUber:true, intlTravel:true, hasLounge:true, wantStreaming:true, wantCellProtect:true, useApple:true, useStubHub:true, useBoutique:true, useResyDunkin:true, useMealKits:true, useClear:true, useRetailCredits:true },
+    label:'Average family of 4', desc:'Groceries, dining, occasional travel'
+  },
+  C: {
+    spend: { grocery_total:850, grocery_online:150, grocery_wholesale:200, dining_total:750, delivery:150, travel_total:1300, travel_portal:500, gas_transit_total:200, transit:100, other_total:450, drugstore:50 },
+    trips: 12, toggles: { useDoorDash:true, useUber:true, intlTravel:true, hasLounge:true, wantStreaming:true, wantCellProtect:true, useApple:true, useStubHub:true, useBoutique:true, useResyDunkin:true, useMealKits:true, useClear:true, useRetailCredits:true },
+    label:'Power user', desc:'Frequent traveler, high spender'
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════
+let spend    = { ...PROFILES.B.spend };
+let trips    = PROFILES.B.trips;
+let toggles  = { ...PROFILES.B.toggles };
+let currentStrategy = 'portal'; // default redemption strategy
+let currentCardName = '';
+let openCardName    = null;
+let lastResults     = [];
+let isLifestyleOpen = false;
+
+const fmt  = n => '$' + Math.round(n).toLocaleString();
+const fmtR = (rate, type) => type === 'cash' ? (rate % 1 === 0 ? rate : rate.toFixed(1)) + '%' : rate + 'x';
+
+// ═══════════════════════════════════════════════════════════════════
+// CORE CALCULATION LOGIC
+// ═══════════════════════════════════════════════════════════════════
+function tieredReward(annualSpend, tiers, pointValue) {
+  let remaining = annualSpend, reward = 0;
+  for (const t of tiers) {
+    if (remaining <= 0) break;
+    const chunk = t.cap === null ? remaining : Math.min(remaining, t.cap);
+    reward += chunk * t.rate * pointValue;
+    remaining -= chunk;
+  }
+  return reward;
+}
+
+function calcSoft(card) {
+  const c = card.credits || {};
+  let items = [];
+
+  if (c.travel > 0)    items.push({ label:'Travel credit', val: c.travel });
+  if (c.dining > 0)    items.push({ label:'Dining / Restaurant credits', val: c.dining });
+  if (c.hotel > 0)     items.push({ label:'Standard Hotel credit',  val: c.hotel  });
+  if (c.airline > 0)   items.push({ label:'Airline fee credit', val: c.airline });
+
+  if (c.doordash > 0 && toggles.useDoorDash) items.push({ label:'DoorDash / DashPass', val: c.doordash });
+  if (c.uber > 0     && toggles.useUber)     items.push({ label:'Uber Cash credit',    val: c.uber });
+  if (c.streaming > 0 && toggles.wantStreaming) items.push({ label:'Streaming credit', val: c.streaming });
+  if (c.digital > 0  && toggles.wantStreaming)  items.push({ label:'Digital entertainment', val: c.digital });
+  if (c.mealkit > 0  && toggles.useMealKits)    items.push({ label:'Meal kit credit', val: c.mealkit });
+  if (c.clear > 0    && toggles.useClear)       items.push({ label:'CLEAR Plus credit', val: c.clear });
+  if (c.retail > 0   && toggles.useRetailCredits) items.push({ label:'Retail credits', val: c.retail });
+  if (c.apple > 0    && toggles.useApple)       items.push({ label:'Apple TV/Music', val: c.apple });
+  if (c.stubhub > 0  && toggles.useStubHub)     items.push({ label:'StubHub credit', val: c.stubhub });
+  if (c.boutique > 0 && toggles.useBoutique)    items.push({ label:'Luxury/Boutique hotel credit', val: c.boutique });
+  if (c.resy_dunkin > 0 && toggles.useResyDunkin) items.push({ label:'Resy & Dunkin credits', val: c.resy_dunkin });
+
+  if (card.tsaYears > 0) items.push({ label:'TSA/Global Entry (amortised)', val: Math.round(120 / card.tsaYears) });
+  if (card.lounge && toggles.hasLounge) items.push({ label:`Lounge access (${trips} trips × $30)`, val: trips * 30 });
+  if (card.cellProtect > 0 && toggles.wantCellProtect) items.push({ label:'Cell phone protection', val: 60 });
+
+  return { items, total: items.reduce((s,i) => s + i.val, 0) };
+}
+
+function calcCard(card) {
+  const breakdown = {};
+  let rawRewards  = 0;
+  
+  // Select the appropriate point value based on the global user strategy
+  let activePv = currentStrategy === 'cash' ? card.pvCash : 
+                 currentStrategy === 'portal' ? card.pvPortal : 
+                 card.pvTransfer;
+
+  for (const [cat, tiers] of Object.entries(card.rates)) {
+    const annualSpend = (spend[cat] || 0) * 12;
+    const earned = tieredReward(annualSpend, tiers, activePv);
+    breakdown[cat] = earned;
+    rawRewards += earned;
+  }
+
+  const totalAnnualSpend = SPEND_GROUPS.reduce((sum, g) => sum + (spend[g.main.key] || 0), 0) * 12;
+  const annivBonus = card.anniversaryPct > 0
+    ? totalAnnualSpend * card.anniversaryPct * activePv
+    : card.anniversaryFlat * activePv;
+
+  const soft  = calcSoft(card);
+  const hard  = rawRewards + annivBonus - card.fee;
+  const net   = hard + soft.total;
+
+  return { hard, soft: soft.total, softItems: soft.items, net, rawRewards, annivBonus, breakdown, activePv };
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// INPUT HANDLERS
+// ═══════════════════════════════════════════════════════════════════
+function setStrategy(val) {
+  currentStrategy = val;
+  recalculate();
+}
+
+function calcBase(groupId) {
+   let group = SPEND_GROUPS.find(g => g.id === groupId);
+   let total = spend[group.main.key] || 0;
+   let subSum = group.subs.reduce((s, sub) => s + (spend[sub.key]||0), 0);
+   spend[group.baseKey] = Math.max(0, total - subSum);
+}
+
+function updateMain(groupId, val) {
+   let newTotal = parseInt(val) || 0;
+   let group = SPEND_GROUPS.find(g => g.id === groupId);
+   spend[group.main.key] = newTotal;
+
+   let subSum = group.subs.reduce((s, sub) => s + (spend[sub.key]||0), 0);
+   if (subSum > newTotal) {
+      if (subSum > 0) {
+         group.subs.forEach(sub => {
+            spend[sub.key] = Math.round((spend[sub.key]||0) / subSum * newTotal);
+         });
+      }
+   }
+   calcBase(groupId);
+   syncUI();
+   recalculate();
+}
+
+function updateSub(groupId, subKey, val) {
+   let newVal = parseInt(val) || 0;
+   let group = SPEND_GROUPS.find(g => g.id === groupId);
+   let total = spend[group.main.key] || 0;
+
+   let otherSubsSum = group.subs.filter(s => s.key !== subKey).reduce((s, sub) => s + (spend[sub.key]||0), 0);
+   let maxAllowed = Math.max(0, total - otherSubsSum);
+   if (newVal > maxAllowed) newVal = maxAllowed;
+
+   spend[subKey] = newVal;
+   calcBase(groupId);
+   syncUI();
+   recalculate();
+}
+
+function syncUI() {
+   SPEND_GROUPS.forEach(g => {
+      const mainSl = document.getElementById('sl-' + g.main.key);
+      const mainVal = document.getElementById('val-' + g.main.key);
+      const mainAnn = document.getElementById('ann-' + g.main.key);
+      if(mainSl) mainSl.value = spend[g.main.key];
+      if(mainVal) mainVal.textContent = fmt(spend[g.main.key]);
+      if(mainAnn) mainAnn.textContent = fmt(spend[g.main.key] * 12) + '/yr';
+
+      g.subs.forEach(sub => {
+         const subSl = document.getElementById('sl-' + sub.key);
+         const subVal = document.getElementById('val-' + sub.key);
+         const subAnn = document.getElementById('ann-' + sub.key);
+         if(subSl) {
+            subSl.max = spend[g.main.key] || 0; 
+            subSl.value = spend[sub.key]; 
+         }
+         if(subVal) subVal.textContent = fmt(spend[sub.key]);
+         if(subAnn) subAnn.textContent = fmt(spend[sub.key] * 12) + '/yr';
+      });
+
+      const baseVal = document.getElementById('val-' + g.baseKey);
+      const baseAnn = document.getElementById('ann-' + g.baseKey);
+      if(baseVal) baseVal.textContent = fmt(spend[g.baseKey]);
+      if(baseAnn) baseAnn.textContent = fmt(spend[g.baseKey] * 12) + '/yr';
+   });
+
+   const grandTotal = SPEND_GROUPS.reduce((s, g) => s + (spend[g.main.key]||0), 0);
+   const gtEl = document.getElementById('grand-total');
+   if (gtEl) gtEl.textContent = fmt(grandTotal * 12);
+}
+
+function setTrips(val) {
+  trips = Math.max(0, Math.min(20, val));
+  const el = document.getElementById('trips-val');
+  if (el) el.textContent = trips;
+  recalculate();
+}
+
+function setToggle(key, val) {
+  toggles[key] = val;
+  recalculate();
+}
+
+function toggleSub(groupId) {
+  const sub = document.getElementById('sub-' + groupId);
+  const btn = document.getElementById('exp-' + groupId);
+  if (sub) sub.classList.toggle('open');
+  if (btn) btn.classList.toggle('open');
+}
+
+function toggleLifestyle() {
+  isLifestyleOpen = !isLifestyleOpen;
+  document.getElementById('lifestyle-panel').classList.toggle('open', isLifestyleOpen);
+}
+
+function setProfile(p) {
+  document.querySelectorAll('.profile-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector(`[data-profile="${p}"]`);
+  if (btn) btn.classList.add('active');
+
+  const prof = PROFILES[p];
+  spend   = { ...prof.spend };
+  trips   = prof.trips;
+  toggles = { ...prof.toggles };
+
+  SPEND_GROUPS.forEach(g => calcBase(g.id));
+  
+  const tv = document.getElementById('trips-val');
+  if (tv) tv.textContent = trips;
+
+  TOGGLES.forEach(t => {
+    const el = document.getElementById('tog-' + t.key);
+    if (el) el.checked = toggles[t.key] || false;
+  });
+
+  SPEND_GROUPS.forEach(g => {
+    const hasSubSpend = g.subs.some(sub => (spend[sub.key] || 0) > 0);
+    const sub = document.getElementById('sub-' + g.id);
+    const eb  = document.getElementById('exp-' + g.id);
+    if (sub) sub.classList.toggle('open', hasSubSpend);
+    if (eb)  eb.classList.toggle('open', hasSubSpend);
+  });
+
+  syncUI();
+  recalculate();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// RENDER RANKINGS
+// ═══════════════════════════════════════════════════════════════════
+const CAT_LABELS = {
+  grocery_instore:'In-store groceries', grocery_online:'Online groceries',
+  grocery_wholesale:'Wholesale clubs', dining:'Dining', delivery:'Food delivery',
+  travel_portal:'Travel portal', travel_direct:'Direct travel',
+  gas:'Gas & EV', transit:'Transit & rideshare', drugstore:'Drugstores', other:'Other spend',
+};
+
+function toggleDrawer(name) {
+  openCardName = openCardName === name ? null : name;
+  renderRankings();
+}
+
+function buildDrawer(r, currentResult) {
+  const breakdownLines = Object.entries(r.breakdown)
+    .filter(([,v]) => v > 0.5)
+    .sort(([,a],[,b]) => b - a);
+
+  let hardHTML = breakdownLines.map(([k,v]) =>
+    `<div class="value-item"><span>${CAT_LABELS[k]||k}</span><span class="value-item-num">${fmt(v)}</span></div>`
+  ).join('');
+
+  if (r.annivBonus > 0)
+    hardHTML += `<div class="value-item"><span>Anniversary bonus</span><span class="value-item-num">${fmt(r.annivBonus)}</span></div>`;
+
+  hardHTML += `<div class="value-item" style="border-top:1px solid rgba(30,58,95,0.1);padding-top:5px;margin-top:3px"><span>Annual fee</span><span class="value-item-num">−${fmt(r.card.fee)}</span></div>`;
+  hardHTML += `<div class="value-item total-line"><span>Net hard value</span><span class="value-item-num">${fmt(r.hard)}</span></div>`;
+
+  const softHTML = r.softItems.length
+    ? r.softItems.map(it => `<div class="value-item"><span>${it.label}</span><span class="value-item-num">${fmt(it.val)}</span></div>`).join('')
+    : '<div class="value-item" style="color:var(--ink3);font-style:italic"><span>No applicable perks selected</span></div>';
+
+  const isCurrent = r.card.name === currentCardName;
+  const d = currentResult ? (r.net - currentResult.net) : null;
+  const badgeText = isCurrent ? "You're currently on this card"
+    : d === null ? 'Select your current card to compare'
+    : d > 5  ? `Switch could save you ${fmt(d)} / yr →`
+    : d < -5 ? `${fmt(Math.abs(d))} less than your current card`
+    : 'Cards are roughly equivalent';
+  const badgeBg = isCurrent ? '#2D7A3D' : (d !== null && d > 5) ? 'var(--accent)' : '#888';
+
+  return `<div class="drawer-inner">
+    <div class="value-card hard">
+      <div class="value-type">Hard value (Valued at ${(r.activePv * 100).toFixed(2)}¢/pt)</div>
+      <div class="value-amount">${fmt(r.hard)}</div>
+      <div class="value-desc">Rewards net of annual fee</div>
+      <div class="value-items">${hardHTML}</div>
+    </div>
+    <div class="value-card soft">
+      <div class="value-type">Soft value</div>
+      <div class="value-amount">${fmt(r.soft)}</div>
+      <div class="value-desc">Credits, perks & lifestyle benefits</div>
+      <div class="value-items">${softHTML}</div>
+    </div>
+  </div>
+  ${r.card.notes ? `<div class="drawer-notes">ℹ ${r.card.notes}</div>` : ''}
+  <div class="drawer-total">
+    <div class="drawer-total-label">Total estimated value<strong>${fmt(r.net)} / yr</strong></div>
+    <span class="switch-badge" style="background:${badgeBg}">${badgeText}</span>
+  </div>`;
+}
+
+function renderRankings() {
+  if (!lastResults.length) return;
+  const currentResult = currentCardName
+    ? lastResults.find(r => r.card.name === currentCardName) || null
+    : null;
+  const recList = document.getElementById('rec-list');
+  if (!recList) return;
+
+  recList.innerHTML = lastResults.map((r, i) => {
+    const isCurrent = r.card.name === currentCardName;
+    const d = currentResult ? (r.net - currentResult.net) : null;
+    const deltaStr = isCurrent ? 'Your current card'
+      : d === null ? ''
+      : d > 0 ? '+' + fmt(d) + ' vs current'
+      : fmt(d) + ' vs current';
+    const deltaClass = isCurrent ? 'rec-delta' : (d !== null && d > 0) ? 'rec-delta positive' : 'rec-delta';
+    const isOpen = openCardName === r.card.name;
+    const badgeCls = r.card.earnType === 'cash' ? 'badge-cash' : r.card.earnType === 'miles' ? 'badge-miles' : 'badge-points';
+    const badgeLabel = r.card.earnType === 'cash' ? 'Cash back' : r.card.earnType === 'miles' ? 'Miles' : 'Points';
+    const topCat = Object.entries(r.breakdown).sort(([,a],[,b])=>b-a)[0];
+    const topRate = topCat ? fmtR(r.card.rates[topCat[0]][0].rate, r.card.earnType) : '';
+    const topLabel = topCat ? CAT_LABELS[topCat[0]] : '';
+    const why = topLabel ? `Best earn: ${topRate} on ${topLabel}` + (r.card.anniversaryPct > 0 ? ` · ${(r.card.anniversaryPct*100).toFixed(0)}% anniv. bonus` : r.card.anniversaryFlat > 0 ? ` · ${(r.card.anniversaryFlat/1000).toFixed(0)}k anniv. miles` : '') : '';
+
+    return `<div class="rec-wrap${isOpen ? ' open' : ''} fade-up" style="animation-delay:${i*0.03}s">
+      <div class="rec-card${i===0?' top':''}" onclick="toggleDrawer('${r.card.name.replace(/'/g,"\\'")}')">
+        <div class="rec-rank">${i+1}</div>
+        <div class="rec-info">
+          <div class="rec-name">${r.card.name}<span class="rec-type-badge ${badgeCls}">${badgeLabel}</span></div>
+          <div class="rec-why">${why}</div>
+        </div>
+        <div class="rec-value">
+          <div class="rec-summary">
+            <div class="rec-stat"><span class="rec-stat-label hard-label">Hard</span><span class="rec-stat-num">${fmt(r.hard)}</span></div>
+            <div class="rec-stat"><span class="rec-stat-label soft-label">Soft</span><span class="rec-stat-num">${fmt(r.soft)}</span></div>
+            <div class="rec-stat total"><span class="rec-stat-label">Total</span><span class="rec-stat-num">${fmt(r.net)}</span></div>
+          </div>
+          <div class="rec-nums"><div class="${deltaClass}">${deltaStr}</div></div>
+          <div class="rec-chevron">▼</div>
+        </div>
+      </div>
+      <div class="rec-drawer">${isOpen ? buildDrawer(r, currentResult) : ''}</div>
+    </div>`;
+  }).join('');
+}
+
+function recalculate() {
+  lastResults = CARDS.map(c => ({ card:c, ...calcCard(c) })).sort((a,b) => b.net - a.net);
+  if (!openCardName) openCardName = lastResults[0]?.card.name || null;
+  renderRankings();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// RENDER UI ON INITIAL LOAD
+// ═══════════════════════════════════════════════════════════════════
+function renderUI() {
+  const profileBtns = ['A','B','C'].map(p => {
+    const prof = PROFILES[p];
+    const ptotal = SPEND_GROUPS.reduce((s, g) => s + (prof.spend[g.main.key]||0), 0) * 12;
+    return `<button class="profile-btn${p==='B'?' active':''}" data-profile="${p}" onclick="setProfile('${p}')">
+      <div class="profile-letter">${p}</div>
+      <div class="profile-name">${prof.label}</div>
+      <div class="profile-desc">${prof.desc}</div>
+      <div class="profile-total">${fmt(ptotal)} / yr</div>
+    </button>`;
+  }).join('');
+
+  const slidersHTML = SPEND_GROUPS.map(g => {
+    const mainVal = spend[g.main.key] || 0;
+
+    const subRowsHTML = g.subs.map(si => {
+      const sv = spend[si.key] || 0;
+      return `<div class="sub-row">
+        <div class="sub-label"><span class="cat-icon">${si.icon}</span>${si.label}</div>
+        <input type="range" id="sl-${si.key}" min="0" max="${g.main.max}" step="${g.main.step}" value="${sv}"
+          oninput="updateSub('${g.id}', '${si.key}', this.value)">
+        <div class="cat-val-wrap">
+          <div class="sub-value" id="val-${si.key}">${fmt(sv)}</div>
+          <div class="sub-annual" id="ann-${si.key}">${fmt(sv*12)}/yr</div>
+        </div>
+        <div></div>
+      </div>`;
+    }).join('');
+
+    const baseRowHTML = `<div class="sub-row base-row">
+        <div class="sub-label"><span class="cat-icon">↳</span>${g.baseLabel}</div>
+        <div class="base-bar-placeholder"></div>
+        <div class="cat-val-wrap">
+          <div class="sub-value" id="val-${g.baseKey}">$0</div>
+          <div class="sub-annual" id="ann-${g.baseKey}">$0/yr</div>
+        </div>
+        <div></div>
+    </div>`;
+
+    return `<div class="cat-group">
+      <div class="category">
+        <div class="cat-label"><span class="cat-icon">${g.icon}</span>${g.main.label}</div>
+        <input type="range" id="sl-${g.main.key}" min="0" max="${g.main.max}" step="${g.main.step}" value="${mainVal}"
+          oninput="updateMain('${g.id}', this.value)">
+        <div class="cat-val-wrap">
+          <div class="cat-value" id="val-${g.main.key}">${fmt(mainVal)}</div>
+          <div class="cat-annual" id="ann-${g.main.key}">${fmt(mainVal*12)}/yr</div>
+        </div>
+        <button class="expand-btn" id="exp-${g.id}" onclick="toggleSub('${g.id}')" title="Sub-categories">▶</button>
+      </div>
+      <div class="sub-rows" id="sub-${g.id}">
+        ${subRowsHTML}
+        ${baseRowHTML}
+      </div>
+    </div>`;
+  }).join('');
+
+  const togglesHTML = TOGGLES.map(t =>
+    `<div class="toggle-row">
+      <div class="toggle-label-wrap">
+        <div class="toggle-label">${t.label}</div>
+        <div class="toggle-sub">${t.sub}</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="tog-${t.key}" ${toggles[t.key] ? 'checked' : ''} onchange="setToggle('${t.key}',this.checked)">
+        <div class="toggle-track"></div>
+      </label>
+    </div>`
+  ).join('');
+
+  const cardOptions = '<option value="">— No current card —</option>' +
+    CARDS.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+
+  document.getElementById('app').innerHTML = `
+    <div class="section-label">Your profile — click to load a starting point</div>
+    <div class="profiles">${profileBtns}</div>
+
+    <div class="strategy-panel">
+      <div class="section-label" style="margin-bottom:12px;">How do you prefer to redeem your rewards?</div>
+      <div class="strategy-controls">
+        <label class="strat-label">
+          <input type="radio" name="strat" value="cash" onchange="setStrategy(this.value)">
+          <div class="strat-box">
+            <div class="strat-title">Statement Credit</div>
+            <div class="strat-desc">Pure cash back (Values Amex at 0.6¢)</div>
+          </div>
+        </label>
+        <label class="strat-label">
+          <input type="radio" name="strat" value="portal" checked onchange="setStrategy(this.value)">
+          <div class="strat-box">
+            <div class="strat-title">Travel Portal</div>
+            <div class="strat-desc">Easy travel booking (Values Chase at 1.5¢)</div>
+          </div>
+        </label>
+        <label class="strat-label">
+          <input type="radio" name="strat" value="transfer" onchange="setStrategy(this.value)">
+          <div class="strat-box">
+            <div class="strat-title">Transfer Partners</div>
+            <div class="strat-desc">Optimized travel (Values points at 2.0¢)</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="spend-panel">
+      <div class="spend-panel-header">
+        <div class="section-label" style="margin:0">Spend by category — slide to adjust</div>
+        <div class="total-year">Total / yr &nbsp;<span id="grand-total">$0</span></div>
+      </div>
+      ${slidersHTML}
+    </div>
+
+    <div class="lifestyle-panel" id="lifestyle-panel">
+      <div class="lifestyle-header" onclick="toggleLifestyle()">
+        <div>
+          <div class="section-label" style="margin:0; color:var(--ink);">Your lifestyle perks</div>
+          <div style="font-size:11px; color:var(--ink2); margin-top:3px;">Currently showing max potential value. Click to customize.</div>
+        </div>
+        <div class="lifestyle-chevron">▼</div>
+      </div>
+      <div class="lifestyle-content">
+        <div class="lifestyle-content-inner">
+          <div class="stepper-row">
+            <div class="toggle-label-wrap">
+              <div class="toggle-label">Trips per year</div>
+              <div class="toggle-sub">Values lounge access at ~$30/visit</div>
+            </div>
+            <div class="stepper-controls">
+              <button class="stepper-btn" onclick="setTrips(trips-1)">−</button>
+              <div class="stepper-val" id="trips-val">${trips}</div>
+              <button class="stepper-btn" onclick="setTrips(trips+1)">+</button>
+            </div>
+          </div>
+          <div class="toggle-grid">${togglesHTML}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="current-card-select">
+      <label>Your current card:</label>
+      <select onchange="currentCardName=this.value;recalculate()">
+        ${cardOptions}
+      </select>
+    </div>
+
+    <div class="section-label">All cards ranked for your profile — click to expand</div>
+    <div id="rec-list"></div>
+  `;
+
+  SPEND_GROUPS.forEach(g => calcBase(g.id));
+  syncUI();
+  recalculate();
+}
+
+renderUI();
+</script>
+</body>
+</html>
