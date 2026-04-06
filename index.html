@@ -93,7 +93,8 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.18); }
 .lifestyle-panel.open .lifestyle-content { max-height: 1200px; padding-bottom: 20px; }
 .lifestyle-content-inner { border-top: 1px solid var(--border); padding-top: 12px; }
 
-.toggle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+/* Updated toggle grid with column gap */
+.toggle-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px; row-gap: 0; }
 .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid var(--border); gap: 12px; }
 .toggle-row:nth-last-child(-n+2) { border-bottom: none; }
 .toggle-label-wrap { flex: 1; }
@@ -1028,7 +1029,7 @@ function renderUI() {
     </div>
   `;
 
-  // Auto-group cards by issuer
+  // Auto-group cards by issuer (Using the unfiltered database so the user can always find their actual card)
   const groupedCards = CARDS.reduce((acc, card) => {
     if (!acc[card.issuer]) acc[card.issuer] = [];
     acc[card.issuer].push(card);
