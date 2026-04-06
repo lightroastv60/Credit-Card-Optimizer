@@ -848,7 +848,25 @@ function syncUI() {
 }
 
 function setTrips(val) { trips = Math.max(0, Math.min(20, val)); document.getElementById('trips-val').textContent = trips; recalculate(); }
-function setToggle(key, val) { toggles[key] = val; recalculate(); }
+
+function toggleAllLifestyle(isChecking) {
+  TOGGLES.forEach(t => {
+    toggles[t.key] = isChecking;
+    const el = document.getElementById('tog-' + t.key);
+    if (el) el.checked = isChecking;
+  });
+  recalculate();
+}
+
+function setToggle(key, val) { 
+  toggles[key] = val; 
+  // Update master toggle if all individual ones are clicked manually
+  const allChecked = TOGGLES.every(t => toggles[t.key]);
+  const masterEl = document.getElementById('tog-master');
+  if (masterEl) masterEl.checked = allChecked;
+  recalculate(); 
+}
+
 function toggleSub(groupId) { document.getElementById('sub-' + groupId)?.classList.toggle('open'); document.getElementById('exp-' + groupId)?.classList.toggle('open'); }
 function toggleLifestyle() { isLifestyleOpen = !isLifestyleOpen; document.getElementById('lifestyle-panel').classList.toggle('open', isLifestyleOpen); }
 
@@ -862,6 +880,11 @@ function setProfile(p) {
   SPEND_GROUPS.forEach(g => calcBase(g.id));
   document.getElementById('trips-val').textContent = trips;
   TOGGLES.forEach(t => { const el = document.getElementById('tog-' + t.key); if (el) el.checked = toggles[t.key] || false; });
+  
+  const allChecked = TOGGLES.every(t => toggles[t.key]);
+  const masterEl = document.getElementById('tog-master');
+  if (masterEl) masterEl.checked = allChecked;
+
   SPEND_GROUPS.forEach(g => {
     const hasSubSpend = g.subs.some(sub => (spend[sub.key] || 0) > 0);
     document.getElementById('sub-' + g.id)?.classList.toggle('open', hasSubSpend);
@@ -991,7 +1014,21 @@ function renderUI() {
 
   const togglesHTML = TOGGLES.map(t => `<div class="toggle-row"><div class="toggle-label-wrap"><div class="toggle-label">${t.label}</div><div class="toggle-sub">${t.sub}</div></div><label class="toggle"><input type="checkbox" id="tog-${t.key}" ${toggles[t.key] ? 'checked' : ''} onchange="setToggle('${t.key}',this.checked)"><div class="toggle-track"></div></label></div>`).join('');
 
-  // Auto-group cards by issuer (Using the unfiltered database so the user can always find their actual card)
+  const allCheckedInitial = TOGGLES.every(t => toggles[t.key]);
+  const masterToggleHTML = `
+    <div class="toggle-row" style="background: var(--accent-light); margin: 0 -24px 12px; padding: 12px 24px; border-bottom: 1.5px solid rgba(45,90,61,0.2);">
+      <div class="toggle-label-wrap">
+        <div class="toggle-label" style="color: var(--accent); font-weight: 600;">Enable All Lifestyle Perks</div>
+        <div class="toggle-sub">Toggle every credit on or off instantly</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="tog-master" ${allCheckedInitial ? 'checked' : ''} onchange="toggleAllLifestyle(this.checked)">
+        <div class="toggle-track"></div>
+      </label>
+    </div>
+  `;
+
+  // Auto-group cards by issuer
   const groupedCards = CARDS.reduce((acc, card) => {
     if (!acc[card.issuer]) acc[card.issuer] = [];
     acc[card.issuer].push(card);
@@ -1025,7 +1062,13 @@ function renderUI() {
 
     <div class="lifestyle-panel" id="lifestyle-panel">
       <div class="lifestyle-header" onclick="toggleLifestyle()"><div><div class="section-label" style="margin:0; color:var(--ink);">Your lifestyle perks</div><div style="font-size:11px; color:var(--ink2); margin-top:3px;">Currently showing max potential value. Click to customize.</div></div><div class="lifestyle-chevron">▼</div></div>
-      <div class="lifestyle-content"><div class="lifestyle-content-inner"><div class="stepper-row"><div class="toggle-label-wrap"><div class="toggle-label">Trips per year</div><div class="toggle-sub">Values lounge access at ~$30/visit</div></div><div class="stepper-controls"><button class="stepper-btn" onclick="setTrips(trips-1)">−</button><div class="stepper-val" id="trips-val">${trips}</div><button class="stepper-btn" onclick="setTrips(trips+1)">+</button></div></div><div class="toggle-grid">${togglesHTML}</div></div></div>
+      <div class="lifestyle-content">
+        <div class="lifestyle-content-inner">
+          <div class="stepper-row"><div class="toggle-label-wrap"><div class="toggle-label">Trips per year</div><div class="toggle-sub">Values lounge access at ~$30/visit</div></div><div class="stepper-controls"><button class="stepper-btn" onclick="setTrips(trips-1)">−</button><div class="stepper-val" id="trips-val">${trips}</div><button class="stepper-btn" onclick="setTrips(trips+1)">+</button></div></div>
+          ${masterToggleHTML}
+          <div class="toggle-grid">${togglesHTML}</div>
+        </div>
+      </div>
     </div>
 
     <div class="controls-row">
