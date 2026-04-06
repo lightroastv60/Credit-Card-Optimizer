@@ -78,13 +78,12 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.18); }
 .sub-annual { font-size: 10px; color: var(--ink3); text-align: right; margin-top: 1px; }
 .sub-row input[type=range]::-webkit-slider-thumb { background: var(--amber); }
 
-/* ALLOCATION REMAINDER ROW */
 .base-row { background: transparent; border-top: 1.5px dashed var(--border) !important; }
 .base-row .sub-label { color: var(--ink); font-weight: 500; }
 .base-row .sub-value { color: var(--ink); }
 .base-bar-placeholder { border-bottom: 1.5px dotted var(--ink3); opacity: 0.3; margin: 0 10px; }
 
-/* LIFESTYLE PANEL (EXPANDABLE) */
+/* LIFESTYLE PANEL */
 .lifestyle-panel { background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 0; margin-bottom: 24px; box-shadow: var(--shadow); }
 .lifestyle-header { padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; transition: background 0.2s; border-radius: var(--radius); }
 .lifestyle-header:hover { background: var(--accent-light); }
@@ -108,18 +107,18 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.18); }
 .toggle-track::after { content: ''; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; background: white; border-radius: 50%; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
 .toggle input:checked + .toggle-track::after { transform: translateX(16px); }
 
-/* STEPPER */
 .stepper-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid var(--border); }
 .stepper-controls { display: flex; align-items: center; gap: 10px; }
 .stepper-btn { width: 28px; height: 28px; border: 1.5px solid var(--border); border-radius: 6px; background: none; cursor: pointer; font-size: 16px; color: var(--ink2); display: flex; align-items: center; justify-content: center; transition: all 0.15s; line-height: 1; }
 .stepper-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
 .stepper-val { font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 500; color: var(--ink); min-width: 28px; text-align: center; }
 
-/* CURRENT CARD */
-.current-card-select { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
-.current-card-select label { font-size: 13px; color: var(--ink2); white-space: nowrap; }
-.current-card-select select { flex: 1; font-family: 'Instrument Sans', sans-serif; font-size: 13px; padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--card); color: var(--ink); cursor: pointer; outline: none; }
-.current-card-select select:focus { border-color: var(--accent); }
+/* CONTROLS ROW (SCORE & CURRENT CARD) */
+.controls-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px; }
+.control-group { display: flex; flex-direction: column; gap: 8px; }
+.control-group label { font-size: 13px; font-weight: 600; color: var(--ink); }
+.control-group select { font-family: 'Instrument Sans', sans-serif; font-size: 13px; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--card); color: var(--ink); cursor: pointer; outline: none; transition: border-color 0.2s; box-shadow: var(--shadow); }
+.control-group select:focus { border-color: var(--accent); }
 optgroup { font-weight: 600; color: var(--ink); }
 
 /* RECS + DRAWER */
@@ -134,7 +133,6 @@ optgroup { font-weight: 600; color: var(--ink); }
 .rec-name { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rec-why { font-size: 11px; color: var(--ink2); margin-top: 2px; line-height: 1.4; }
 
-/* HORIZONTAL VALUE SUMMARY */
 .rec-value { text-align: right; flex-shrink: 0; display: flex; align-items: center; gap: 0; }
 .rec-promo { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; padding-right: 16px; border-right: 1px solid var(--border); margin-right: 16px; }
 .rec-summary { display: grid; grid-template-columns: 50px 50px 65px; gap: 16px; border-right: 1px solid var(--border); padding-right: 16px; margin-right: 8px; }
@@ -155,8 +153,6 @@ optgroup { font-weight: 600; color: var(--ink); }
 .badge-points { background: #E8EEF5; color: var(--hard); }
 .badge-miles { background: #FEF3E2; color: var(--amber); }
 .badge-cash { background: #E8F0EB; color: var(--accent); }
-
-/* APPLY BUTTON */
 .apply-btn { display: inline-block; background: var(--accent); color: white; font-family: 'Instrument Sans', sans-serif; font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 6px; text-decoration: none; margin-left: 12px; transition: background 0.2s, transform 0.1s; white-space: nowrap; }
 .apply-btn:hover { background: #1e3c28; transform: translateY(-1px); }
 
@@ -215,6 +211,7 @@ optgroup { font-weight: 600; color: var(--ink); }
   .rec-summary { grid-template-columns: auto auto auto; gap: 10px; }
   .drawer-header-row { flex-direction: column; align-items: center; text-align: center; }
   .drawer-card-img { width: 100%; height: auto; max-width: 200px; }
+  .controls-row { grid-template-columns: 1fr; gap: 20px; }
 }
 </style>
 </head>
@@ -229,12 +226,13 @@ optgroup { font-weight: 600; color: var(--ink); }
 
 <script>
 // ═══════════════════════════════════════════════════════════════════
-// CARD DATABASE (Updated with Official Issuer Card Art)
+// CARD DATABASE (Updated with Credit Tiers + 5 New Cards)
 // ═══════════════════════════════════════════════════════════════════
 const CARDS = [
   {
     name: 'Chase Sapphire Preferred',
     issuer: 'Chase', imgUrl: 'https://creditcards.chase.com/K-8/v6/images/cardart/sapphire_preferred_card.png',
+    credit: 'Good',
     fee: 95, earnType: 'points', pvCash: 0.01, pvPortal: 0.0125, pvTransfer: 0.02,
     applyUrl: 'https://creditcards.chase.com/rewards-credit-cards/sapphire/preferred',
     promo: { points: 75000, flatCash: 0, text: "75,000 points after $5k spend in 3 mos" },
@@ -252,6 +250,7 @@ const CARDS = [
   {
     name: 'American Express Gold Card',
     issuer: 'American Express', imgUrl: 'https://icm.aexp-static.com/Internet/explorecards/US/en/cards/american-express-gold-card/gold-card-800x504.png',
+    credit: 'Good',
     fee: 325, earnType: 'points', pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.02,
     applyUrl: 'https://www.americanexpress.com/us/credit-cards/card/gold-card/',
     promo: { points: 100000, flatCash: 0, text: "Up to 100k points after $6k spend in 6 mos" },
@@ -269,6 +268,7 @@ const CARDS = [
   {
     name: 'Capital One Venture',
     issuer: 'Capital One', imgUrl: 'https://ecm.capitalone.com/WCM/card/products/venture-card-art.png',
+    credit: 'Good',
     fee: 95, earnType: 'miles', pvCash: 0.005, pvPortal: 0.01, pvTransfer: 0.02,
     applyUrl: 'https://www.capitalone.com/credit-cards/venture/',
     promo: { points: 75000, flatCash: 250, text: "75k miles + $250 travel credit after $4k spend" },
@@ -286,6 +286,7 @@ const CARDS = [
   {
     name: 'Citi Strata Premier',
     issuer: 'Citi', imgUrl: 'https://www.citi.com/CRD/images/citi-strata-premier-credit-card/citi-strata-premier-credit-card.jpg',
+    credit: 'Good',
     fee: 95, earnType: 'points', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.02,
     applyUrl: 'https://www.citi.com/credit-cards/citi-strata-premier-credit-card',
     promo: { points: 70000, flatCash: 0, text: "70,000 points after $4k spend in 3 mos" },
@@ -303,6 +304,7 @@ const CARDS = [
   {
     name: 'Wells Fargo Autograph',
     issuer: 'Wells Fargo', imgUrl: 'https://creditcards.wellsfargo.com/WFS/cardart/W_CC_Autograph.png',
+    credit: 'Good',
     fee: 0, earnType: 'points', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.015,
     applyUrl: 'https://creditcards.wellsfargo.com/autograph-rewards-credit-card/',
     promo: { points: 20000, flatCash: 0, text: "20,000 points after $1k spend in 3 mos" },
@@ -320,6 +322,7 @@ const CARDS = [
   {
     name: 'Bank of America Travel Rewards',
     issuer: 'Bank of America', imgUrl: 'https://www.bankofamerica.com/content/images/ContextualSite/cre-7080-travel-rewards-cc-en_US-250x158.png',
+    credit: 'Good',
     fee: 0, earnType: 'points', pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://www.bankofamerica.com/credit-cards/products/travel-rewards-credit-card/',
     promo: { points: 25000, flatCash: 0, text: "25,000 points after $1k spend in 90 days" },
@@ -337,6 +340,7 @@ const CARDS = [
   {
     name: 'Discover it Miles',
     issuer: 'Discover', imgUrl: 'https://www.discover.com/content/dam/dfs/credit-cards/card-art/cards/travel.png',
+    credit: 'Good',
     fee: 0, earnType: 'miles', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://www.discover.com/credit-cards/travel/',
     promo: { points: 0, flatCash: 0, text: "Unlimited Mile Match at end of first year" },
@@ -354,6 +358,7 @@ const CARDS = [
   {
     name: 'Discover it Cash Back',
     issuer: 'Discover', imgUrl: 'https://www.discover.com/content/dam/dfs/credit-cards/card-art/cards/cash-back.png',
+    credit: 'Good',
     fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://www.discover.com/credit-cards/cash-back/',
     promo: { points: 0, flatCash: 0, text: "Unlimited Cash Back Match at end of first year" },
@@ -371,6 +376,7 @@ const CARDS = [
   {
     name: 'Chase Freedom Unlimited',
     issuer: 'Chase', imgUrl: 'https://creditcards.chase.com/K-8/v6/images/cardart/freedom_unlimited_card.png',
+    credit: 'Good',
     fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://creditcards.chase.com/cash-back-credit-cards/freedom/unlimited',
     promo: { points: 25000, flatCash: 0, text: "$250 bonus after $500 spend in 3 mos" },
@@ -388,6 +394,7 @@ const CARDS = [
   {
     name: 'Chase Freedom Flex',
     issuer: 'Chase', imgUrl: 'https://creditcards.chase.com/K-8/v6/images/cardart/freedom_flex_card.png',
+    credit: 'Good',
     fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://creditcards.chase.com/cash-back-credit-cards/freedom/flex',
     promo: { points: 20000, flatCash: 0, text: "$200 bonus after $500 spend in 3 mos" },
@@ -405,6 +412,7 @@ const CARDS = [
   {
     name: 'Amex Blue Cash Preferred',
     issuer: 'American Express', imgUrl: 'https://icm.aexp-static.com/Internet/explorecards/US/en/cards/blue-cash-preferred-card/blue-cash-preferred-card-800x504.png',
+    credit: 'Good',
     fee: 95, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://www.americanexpress.com/us/credit-cards/card/blue-cash-preferred/',
     promo: { points: 25000, flatCash: 0, text: "$250 statement credit after $3k spend in 6 mos" },
@@ -422,6 +430,7 @@ const CARDS = [
   {
     name: 'Amex Blue Cash Everyday',
     issuer: 'American Express', imgUrl: 'https://icm.aexp-static.com/Internet/explorecards/US/en/cards/blue-cash-everyday-card/blue-cash-everyday-card-800x504.png',
+    credit: 'Good',
     fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://www.americanexpress.com/us/credit-cards/card/blue-cash-everyday/',
     promo: { points: 20000, flatCash: 0, text: "$200 statement credit after $2k spend in 6 mos" },
@@ -439,6 +448,7 @@ const CARDS = [
   {
     name: 'Citi Double Cash',
     issuer: 'Citi', imgUrl: 'https://www.citi.com/CRD/images/citi-double-cash-credit-card/citi-double-cash-credit-card.jpg',
+    credit: 'Good',
     fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://www.citi.com/credit-cards/citi-double-cash-credit-card',
     promo: { points: 20000, flatCash: 0, text: "$200 cash back after $1,500 spend in 6 mos" },
@@ -456,6 +466,7 @@ const CARDS = [
   {
     name: 'Capital One Savor Cash',
     issuer: 'Capital One', imgUrl: 'https://ecm.capitalone.com/WCM/card/products/savor-card-art.png',
+    credit: 'Good',
     fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://www.capitalone.com/credit-cards/savor/',
     promo: { points: 25000, flatCash: 0, text: "$250 cash bonus after $500 spend in 3 mos" },
@@ -473,6 +484,7 @@ const CARDS = [
   {
     name: 'Wells Fargo Active Cash',
     issuer: 'Wells Fargo', imgUrl: 'https://creditcards.wellsfargo.com/WFS/cardart/W_CC_Active_Cash.png',
+    credit: 'Good',
     fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
     applyUrl: 'https://creditcards.wellsfargo.com/active-cash-credit-card/',
     promo: { points: 20000, flatCash: 0, text: "$200 cash rewards after $500 spend in 3 mos" },
@@ -490,6 +502,7 @@ const CARDS = [
   {
     name: 'Chase Sapphire Reserve',
     issuer: 'Chase', imgUrl: 'https://creditcards.chase.com/K-8/v6/images/cardart/sapphire_reserve_card.png',
+    credit: 'Excellent',
     fee: 795, earnType: 'points', pvCash: 0.01, pvPortal: 0.015, pvTransfer: 0.02,
     applyUrl: 'https://creditcards.chase.com/rewards-credit-cards/sapphire/reserve',
     promo: { points: 125000, flatCash: 0, text: "125,000 points after $6k spend in 3 mos" },
@@ -507,6 +520,7 @@ const CARDS = [
   {
     name: 'American Express Platinum',
     issuer: 'American Express', imgUrl: 'https://icm.aexp-static.com/Internet/explorecards/US/en/cards/platinum-card/platinum-card-800x504.png',
+    credit: 'Excellent',
     fee: 895, earnType: 'points', pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.02,
     applyUrl: 'https://www.americanexpress.com/us/credit-cards/card/platinum/',
     promo: { points: 150000, flatCash: 0, text: "Up to 150k points after $8k spend in 6 mos" },
@@ -524,6 +538,7 @@ const CARDS = [
   {
     name: 'American Express Business Platinum',
     issuer: 'American Express', imgUrl: 'https://icm.aexp-static.com/Internet/explorecards/US/en/cards/business-platinum-card/business-platinum-card-800x504.png',
+    credit: 'Excellent',
     fee: 695, earnType: 'points', pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.02,
     applyUrl: 'https://www.americanexpress.com/us/credit-cards/card/business-platinum/',
     promo: { points: 250000, flatCash: 0, text: "Up to 250k points after $20k spend in 3 mos" },
@@ -541,6 +556,7 @@ const CARDS = [
   {
     name: 'American Express Business Gold',
     issuer: 'American Express', imgUrl: 'https://icm.aexp-static.com/Internet/explorecards/US/en/cards/business-gold-card/business-gold-card-800x504.png',
+    credit: 'Good',
     fee: 375, earnType: 'points', pvCash: 0.006, pvPortal: 0.01, pvTransfer: 0.02,
     applyUrl: 'https://www.americanexpress.com/us/credit-cards/card/business-gold/',
     promo: { points: 150000, flatCash: 0, text: "Up to 150k points after $15k spend in 3 mos" },
@@ -558,6 +574,7 @@ const CARDS = [
   {
     name: 'Capital One Venture X',
     issuer: 'Capital One', imgUrl: 'https://ecm.capitalone.com/WCM/card/products/venture-x/venture-x-card-art.png',
+    credit: 'Excellent',
     fee: 395, earnType: 'miles', pvCash: 0.005, pvPortal: 0.01, pvTransfer: 0.02,
     applyUrl: 'https://www.capitalone.com/credit-cards/venture-x/',
     promo: { points: 75000, flatCash: 0, text: "75,000 miles after $4k spend in 3 mos" },
@@ -572,53 +589,106 @@ const CARDS = [
     lounge: true, tsaYears: 4, cellProtect: 800, anniversaryPct: 0, anniversaryFlat: 10000,
     notes: '$300 travel credit via portal. 10,000 anniversary miles. Cap1 Miles are only worth 0.5¢ for statement credits.',
   },
+
+  // ═══════════════════════════════════════════════════════════════════
+  // NEW CARDS FOR FAIR & BUILDING CREDIT TIERS
+  // ═══════════════════════════════════════════════════════════════════
+  {
+    name: 'Capital One QuicksilverOne',
+    issuer: 'Capital One', imgUrl: 'https://ecm.capitalone.com/WCM/card/products/quicksilver-card-art.png',
+    credit: 'Fair',
+    fee: 39, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    applyUrl: 'https://www.capitalone.com/credit-cards/quicksilverone/',
+    promo: { points: 0, flatCash: 0, text: "None" },
+    rates: {
+      grocery_instore:  [{rate:1.5,cap:null}], grocery_online:   [{rate:1.5,cap:null}], grocery_wholesale:[{rate:1.5,cap:null}],
+      dining:           [{rate:1.5,cap:null}], delivery:         [{rate:1.5,cap:null}],
+      travel_portal:    [{rate:1.5,cap:null}], travel_direct:    [{rate:1.5,cap:null}],
+      gas:              [{rate:1.5,cap:null}], transit:          [{rate:1.5,cap:null}],
+      drugstore:        [{rate:1.5,cap:null}], other:            [{rate:1.5,cap:null}],
+    },
+    credits: {}, lounge: false, tsaYears: 0, cellProtect: 0, anniversaryPct: 0, anniversaryFlat: 0,
+    notes: 'Designed specifically for Fair credit. Uncapped 1.5% cash back on all purchases, but carries a $39 annual fee.',
+  },
+  {
+    name: 'Capital One Platinum',
+    issuer: 'Capital One', imgUrl: 'https://ecm.capitalone.com/WCM/card/products/platinum-card-art.png',
+    credit: 'Building',
+    fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    applyUrl: 'https://www.capitalone.com/credit-cards/platinum/',
+    promo: { points: 0, flatCash: 0, text: "None" },
+    rates: {
+      grocery_instore:  [{rate:0,cap:null}], grocery_online:   [{rate:0,cap:null}], grocery_wholesale:[{rate:0,cap:null}],
+      dining:           [{rate:0,cap:null}], delivery:         [{rate:0,cap:null}],
+      travel_portal:    [{rate:0,cap:null}], travel_direct:    [{rate:0,cap:null}],
+      gas:              [{rate:0,cap:null}], transit:          [{rate:0,cap:null}],
+      drugstore:        [{rate:0,cap:null}], other:            [{rate:0,cap:null}],
+    },
+    credits: {}, lounge: false, tsaYears: 0, cellProtect: 0, anniversaryPct: 0, anniversaryFlat: 0,
+    notes: 'A pure builder card. Zero rewards, but zero annual fee. Automatically considered for a higher credit line in 6 months.',
+  },
+  {
+    name: 'Petal 2 "Cash Back, No Fees" Visa',
+    issuer: 'Petal', imgUrl: 'https://placehold.co/240x152/2D5A3D/ffffff?text=Petal+2',
+    credit: 'Fair',
+    fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    applyUrl: 'https://www.petalcard.com/',
+    promo: { points: 0, flatCash: 0, text: "None" },
+    rates: {
+      grocery_instore:  [{rate:1,cap:null}], grocery_online:   [{rate:1,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
+      dining:           [{rate:1,cap:null}], delivery:         [{rate:1,cap:null}],
+      travel_portal:    [{rate:1,cap:null}], travel_direct:    [{rate:1,cap:null}],
+      gas:              [{rate:1,cap:null}], transit:          [{rate:1,cap:null}],
+      drugstore:        [{rate:1,cap:null}], other:            [{rate:1,cap:null}],
+    },
+    credits: {}, lounge: false, tsaYears: 0, cellProtect: 0, anniversaryPct: 0, anniversaryFlat: 0,
+    notes: 'Approves based on your banking history, not just credit score. Base 1% cash back can grow to 1.5% with on-time payments.',
+  },
+  {
+    name: 'Discover it Student Cash Back',
+    issuer: 'Discover', imgUrl: 'https://www.discover.com/content/dam/dfs/credit-cards/card-art/cards/student-cash-back.png',
+    credit: 'Building',
+    fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    applyUrl: 'https://www.discover.com/credit-cards/student/it-card.html',
+    promo: { points: 0, flatCash: 0, text: "Unlimited Cash Back Match at end of first year" },
+    rates: {
+      grocery_instore:  [{rate:1,cap:null}], grocery_online:   [{rate:1,cap:null}], grocery_wholesale:[{rate:1,cap:null}],
+      dining:           [{rate:1,cap:null}], delivery:         [{rate:1,cap:null}],
+      travel_portal:    [{rate:1,cap:null}], travel_direct:    [{rate:1,cap:null}],
+      gas:              [{rate:1,cap:null}], transit:          [{rate:1,cap:null}],
+      drugstore:        [{rate:1,cap:null}], other:            [{rate:1,cap:null}],
+    },
+    credits: {}, lounge: false, tsaYears: 0, cellProtect: 0, anniversaryPct: 0, anniversaryFlat: 0,
+    notes: 'Excellent student card. 5% cash back on rotating quarterly categories (modeled here at base 1%). No credit score required to apply.',
+  },
+  {
+    name: 'Chase Freedom Rise',
+    issuer: 'Chase', imgUrl: 'https://creditcards.chase.com/K-8/v6/images/cardart/freedom_rise_card.png',
+    credit: 'Building',
+    fee: 0, earnType: 'cash', pvCash: 0.01, pvPortal: 0.01, pvTransfer: 0.01,
+    applyUrl: 'https://creditcards.chase.com/cash-back-credit-cards/freedom/rise',
+    promo: { points: 2500, flatCash: 0, text: "$25 statement credit for enrolling in autopay" },
+    rates: {
+      grocery_instore:  [{rate:1.5,cap:null}], grocery_online:   [{rate:1.5,cap:null}], grocery_wholesale:[{rate:1.5,cap:null}],
+      dining:           [{rate:1.5,cap:null}], delivery:         [{rate:1.5,cap:null}],
+      travel_portal:    [{rate:1.5,cap:null}], travel_direct:    [{rate:1.5,cap:null}],
+      gas:              [{rate:1.5,cap:null}], transit:          [{rate:1.5,cap:null}],
+      drugstore:        [{rate:1.5,cap:null}], other:            [{rate:1.5,cap:null}],
+    },
+    credits: {}, lounge: false, tsaYears: 0, cellProtect: 0, anniversaryPct: 0, anniversaryFlat: 0,
+    notes: 'Designed to build credit with Chase. Earns a flat 1.5% cash back on all purchases. Having a Chase checking account increases approval odds.',
+  }
 ];
 
 // ═══════════════════════════════════════════════════════════════════
-// ALLOCATION SPEND INPUTS (Master -> Subs -> Remainder)
+// ALLOCATION SPEND INPUTS & PROFILES
 // ═══════════════════════════════════════════════════════════════════
 const SPEND_GROUPS = [
-  {
-    id: 'groceries', icon: '🛒',
-    main: { key: 'grocery_total', label: 'Total Groceries', max: 2000, step: 50 },
-    baseKey: 'grocery_instore', baseLabel: 'In-store (Remainder)',
-    subs: [
-      { key: 'grocery_online', label: 'Online / Delivery', icon: '📦' },
-      { key: 'grocery_wholesale', label: 'Wholesale clubs', icon: '🏭' }
-    ]
-  },
-  {
-    id: 'dining', icon: '🍽',
-    main: { key: 'dining_total', label: 'Total Dining', max: 1500, step: 25 },
-    baseKey: 'dining', baseLabel: 'Restaurants (Remainder)',
-    subs: [
-      { key: 'delivery', label: 'Food delivery apps', icon: '🛵' }
-    ]
-  },
-  {
-    id: 'travel', icon: '✈️',
-    main: { key: 'travel_total', label: 'Total Travel', max: 3000, step: 50 },
-    baseKey: 'travel_direct', baseLabel: 'Booked Direct (Remainder)',
-    subs: [
-      { key: 'travel_portal', label: 'Booked via portal', icon: '🌐' }
-    ]
-  },
-  {
-    id: 'gas_transit', icon: '🚗',
-    main: { key: 'gas_transit_total', label: 'Total Auto & Transit', max: 1000, step: 25 },
-    baseKey: 'gas', baseLabel: 'Gas / EV (Remainder)',
-    subs: [
-      { key: 'transit', label: 'Transit & rideshare', icon: '🚌' }
-    ]
-  },
-  {
-    id: 'other', icon: '🛍',
-    main: { key: 'other_total', label: 'Total Retail & Other', max: 3000, step: 50 },
-    baseKey: 'other', baseLabel: 'General spend (Remainder)',
-    subs: [
-      { key: 'drugstore', label: 'Drugstores (CVS, etc.)', icon: '💊' }
-    ]
-  }
+  { id: 'groceries', icon: '🛒', main: { key: 'grocery_total', label: 'Total Groceries', max: 2000, step: 50 }, baseKey: 'grocery_instore', baseLabel: 'In-store (Remainder)', subs: [{ key: 'grocery_online', label: 'Online / Delivery', icon: '📦' }, { key: 'grocery_wholesale', label: 'Wholesale clubs', icon: '🏭' }] },
+  { id: 'dining', icon: '🍽', main: { key: 'dining_total', label: 'Total Dining', max: 1500, step: 25 }, baseKey: 'dining', baseLabel: 'Restaurants (Remainder)', subs: [{ key: 'delivery', label: 'Food delivery apps', icon: '🛵' }] },
+  { id: 'travel', icon: '✈️', main: { key: 'travel_total', label: 'Total Travel', max: 3000, step: 50 }, baseKey: 'travel_direct', baseLabel: 'Booked Direct (Remainder)', subs: [{ key: 'travel_portal', label: 'Booked via portal', icon: '🌐' }] },
+  { id: 'gas_transit', icon: '🚗', main: { key: 'gas_transit_total', label: 'Total Auto & Transit', max: 1000, step: 25 }, baseKey: 'gas', baseLabel: 'Gas / EV (Remainder)', subs: [{ key: 'transit', label: 'Transit & rideshare', icon: '🚌' }] },
+  { id: 'other', icon: '🛍', main: { key: 'other_total', label: 'Total Retail & Other', max: 3000, step: 50 }, baseKey: 'other', baseLabel: 'General spend (Remainder)', subs: [{ key: 'drugstore', label: 'Drugstores (CVS, etc.)', icon: '💊' }] }
 ];
 
 const TOGGLES = [
@@ -638,21 +708,9 @@ const TOGGLES = [
 ];
 
 const PROFILES = {
-  A: {
-    spend: { grocery_total:200, grocery_online:0, grocery_wholesale:0, dining_total:100, delivery:0, travel_total:50, travel_portal:0, gas_transit_total:100, transit:0, other_total:175, drugstore:25 },
-    trips: 2, toggles: { useDoorDash:true, useUber:true, intlTravel:true, hasLounge:true, wantStreaming:true, wantCellProtect:true, useApple:true, useStubHub:true, useBoutique:true, useResyDunkin:true, useMealKits:true, useClear:true, useRetailCredits:true },
-    label:'Just the essentials', desc:'Single or couple, modest spend'
-  },
-  B: {
-    spend: { grocery_total:700, grocery_online:100, grocery_wholesale:0, dining_total:350, delivery:50, travel_total:200, travel_portal:0, gas_transit_total:200, transit:50, other_total:300, drugstore:50 },
-    trips: 4, toggles: { useDoorDash:true, useUber:true, intlTravel:true, hasLounge:true, wantStreaming:true, wantCellProtect:true, useApple:true, useStubHub:true, useBoutique:true, useResyDunkin:true, useMealKits:true, useClear:true, useRetailCredits:true },
-    label:'Average family of 4', desc:'Groceries, dining, occasional travel'
-  },
-  C: {
-    spend: { grocery_total:850, grocery_online:150, grocery_wholesale:200, dining_total:750, delivery:150, travel_total:1300, travel_portal:500, gas_transit_total:200, transit:100, other_total:450, drugstore:50 },
-    trips: 12, toggles: { useDoorDash:true, useUber:true, intlTravel:true, hasLounge:true, wantStreaming:true, wantCellProtect:true, useApple:true, useStubHub:true, useBoutique:true, useResyDunkin:true, useMealKits:true, useClear:true, useRetailCredits:true },
-    label:'Power user', desc:'Frequent traveler, high spender'
-  },
+  A: { spend: { grocery_total:200, grocery_online:0, grocery_wholesale:0, dining_total:100, delivery:0, travel_total:50, travel_portal:0, gas_transit_total:100, transit:0, other_total:175, drugstore:25 }, trips: 2, toggles: { useDoorDash:true, useUber:true, intlTravel:true, hasLounge:true, wantStreaming:true, wantCellProtect:true, useApple:true, useStubHub:true, useBoutique:true, useResyDunkin:true, useMealKits:true, useClear:true, useRetailCredits:true }, label:'Just the essentials', desc:'Single or couple, modest spend' },
+  B: { spend: { grocery_total:700, grocery_online:100, grocery_wholesale:0, dining_total:350, delivery:50, travel_total:200, travel_portal:0, gas_transit_total:200, transit:50, other_total:300, drugstore:50 }, trips: 4, toggles: { useDoorDash:true, useUber:true, intlTravel:true, hasLounge:true, wantStreaming:true, wantCellProtect:true, useApple:true, useStubHub:true, useBoutique:true, useResyDunkin:true, useMealKits:true, useClear:true, useRetailCredits:true }, label:'Average family of 4', desc:'Groceries, dining, occasional travel' },
+  C: { spend: { grocery_total:850, grocery_online:150, grocery_wholesale:200, dining_total:750, delivery:150, travel_total:1300, travel_portal:500, gas_transit_total:200, transit:100, other_total:450, drugstore:50 }, trips: 12, toggles: { useDoorDash:true, useUber:true, intlTravel:true, hasLounge:true, wantStreaming:true, wantCellProtect:true, useApple:true, useStubHub:true, useBoutique:true, useResyDunkin:true, useMealKits:true, useClear:true, useRetailCredits:true }, label:'Power user', desc:'Frequent traveler, high spender' },
 };
 
 // ═══════════════════════════════════════════════════════════════════
@@ -661,8 +719,9 @@ const PROFILES = {
 let spend    = { ...PROFILES.B.spend };
 let trips    = PROFILES.B.trips;
 let toggles  = { ...PROFILES.B.toggles };
-let currentStrategy = 'portal'; // default redemption strategy
+let currentStrategy = 'portal';
 let currentCardName = '';
+let userScoreFilter = 4; // Default mapping: 4=Excellent, 3=Good, 2=Fair, 1=Building
 let openCardName    = null;
 let lastResults     = [];
 let isLifestyleOpen = false;
@@ -720,7 +779,6 @@ function calcCard(card) {
                  currentStrategy === 'portal' ? card.pvPortal : 
                  card.pvTransfer;
 
-  // Calculate promotional value based on selected strategy
   const promoValue = (card.promo.points * activePv) + card.promo.flatCash;
 
   for (const [cat, tiers] of Object.entries(card.rates)) {
@@ -731,9 +789,7 @@ function calcCard(card) {
   }
 
   const totalAnnualSpend = SPEND_GROUPS.reduce((sum, g) => sum + (spend[g.main.key] || 0), 0) * 12;
-  const annivBonus = card.anniversaryPct > 0
-    ? totalAnnualSpend * card.anniversaryPct * activePv
-    : card.anniversaryFlat * activePv;
+  const annivBonus = card.anniversaryPct > 0 ? totalAnnualSpend * card.anniversaryPct * activePv : card.anniversaryFlat * activePv;
 
   const soft  = calcSoft(card);
   const hard  = rawRewards + annivBonus - card.fee;
@@ -745,10 +801,8 @@ function calcCard(card) {
 // ═══════════════════════════════════════════════════════════════════
 // INPUT HANDLERS
 // ═══════════════════════════════════════════════════════════════════
-function setStrategy(val) {
-  currentStrategy = val;
-  recalculate();
-}
+function setStrategy(val) { currentStrategy = val; recalculate(); }
+function setScoreFilter(val) { userScoreFilter = parseInt(val); recalculate(); }
 
 function calcBase(groupId) {
    let group = SPEND_GROUPS.find(g => g.id === groupId);
@@ -761,211 +815,113 @@ function updateMain(groupId, val) {
    let newTotal = parseInt(val) || 0;
    let group = SPEND_GROUPS.find(g => g.id === groupId);
    spend[group.main.key] = newTotal;
-
    let subSum = group.subs.reduce((s, sub) => s + (spend[sub.key]||0), 0);
-   if (subSum > newTotal) {
-      if (subSum > 0) {
-         group.subs.forEach(sub => {
-            spend[sub.key] = Math.round((spend[sub.key]||0) / subSum * newTotal);
-         });
-      }
+   if (subSum > newTotal && subSum > 0) {
+      group.subs.forEach(sub => spend[sub.key] = Math.round((spend[sub.key]||0) / subSum * newTotal));
    }
-   calcBase(groupId);
-   syncUI();
-   recalculate();
+   calcBase(groupId); syncUI(); recalculate();
 }
 
 function updateSub(groupId, subKey, val) {
    let newVal = parseInt(val) || 0;
    let group = SPEND_GROUPS.find(g => g.id === groupId);
-   let total = spend[group.main.key] || 0;
-
-   let otherSubsSum = group.subs.filter(s => s.key !== subKey).reduce((s, sub) => s + (spend[sub.key]||0), 0);
-   let maxAllowed = Math.max(0, total - otherSubsSum);
-   if (newVal > maxAllowed) newVal = maxAllowed;
-
-   spend[subKey] = newVal;
-   calcBase(groupId);
-   syncUI();
-   recalculate();
+   let maxAllowed = Math.max(0, (spend[group.main.key] || 0) - group.subs.filter(s => s.key !== subKey).reduce((s, sub) => s + (spend[sub.key]||0), 0));
+   spend[subKey] = newVal > maxAllowed ? maxAllowed : newVal;
+   calcBase(groupId); syncUI(); recalculate();
 }
 
 function syncUI() {
    SPEND_GROUPS.forEach(g => {
-      const mainSl = document.getElementById('sl-' + g.main.key);
-      const mainVal = document.getElementById('val-' + g.main.key);
-      const mainAnn = document.getElementById('ann-' + g.main.key);
+      const mainSl = document.getElementById('sl-' + g.main.key), mainVal = document.getElementById('val-' + g.main.key), mainAnn = document.getElementById('ann-' + g.main.key);
       if(mainSl) mainSl.value = spend[g.main.key];
       if(mainVal) mainVal.textContent = fmt(spend[g.main.key]);
       if(mainAnn) mainAnn.textContent = fmt(spend[g.main.key] * 12) + '/yr';
 
       g.subs.forEach(sub => {
-         const subSl = document.getElementById('sl-' + sub.key);
-         const subVal = document.getElementById('val-' + sub.key);
-         const subAnn = document.getElementById('ann-' + sub.key);
-         if(subSl) {
-            subSl.max = spend[g.main.key] || 0; 
-            subSl.value = spend[sub.key]; 
-         }
+         const subSl = document.getElementById('sl-' + sub.key), subVal = document.getElementById('val-' + sub.key), subAnn = document.getElementById('ann-' + sub.key);
+         if(subSl) { subSl.max = spend[g.main.key] || 0; subSl.value = spend[sub.key]; }
          if(subVal) subVal.textContent = fmt(spend[sub.key]);
          if(subAnn) subAnn.textContent = fmt(spend[sub.key] * 12) + '/yr';
       });
 
-      const baseVal = document.getElementById('val-' + g.baseKey);
-      const baseAnn = document.getElementById('ann-' + g.baseKey);
+      const baseVal = document.getElementById('val-' + g.baseKey), baseAnn = document.getElementById('ann-' + g.baseKey);
       if(baseVal) baseVal.textContent = fmt(spend[g.baseKey]);
       if(baseAnn) baseAnn.textContent = fmt(spend[g.baseKey] * 12) + '/yr';
    });
-
-   const grandTotal = SPEND_GROUPS.reduce((s, g) => s + (spend[g.main.key]||0), 0);
    const gtEl = document.getElementById('grand-total');
-   if (gtEl) gtEl.textContent = fmt(grandTotal * 12);
+   if (gtEl) gtEl.textContent = fmt(SPEND_GROUPS.reduce((s, g) => s + (spend[g.main.key]||0), 0) * 12);
 }
 
-function setTrips(val) {
-  trips = Math.max(0, Math.min(20, val));
-  const el = document.getElementById('trips-val');
-  if (el) el.textContent = trips;
-  recalculate();
-}
-
-function setToggle(key, val) {
-  toggles[key] = val;
-  recalculate();
-}
-
-function toggleSub(groupId) {
-  const sub = document.getElementById('sub-' + groupId);
-  const btn = document.getElementById('exp-' + groupId);
-  if (sub) sub.classList.toggle('open');
-  if (btn) btn.classList.toggle('open');
-}
-
-function toggleLifestyle() {
-  isLifestyleOpen = !isLifestyleOpen;
-  document.getElementById('lifestyle-panel').classList.toggle('open', isLifestyleOpen);
-}
+function setTrips(val) { trips = Math.max(0, Math.min(20, val)); document.getElementById('trips-val').textContent = trips; recalculate(); }
+function setToggle(key, val) { toggles[key] = val; recalculate(); }
+function toggleSub(groupId) { document.getElementById('sub-' + groupId)?.classList.toggle('open'); document.getElementById('exp-' + groupId)?.classList.toggle('open'); }
+function toggleLifestyle() { isLifestyleOpen = !isLifestyleOpen; document.getElementById('lifestyle-panel').classList.toggle('open', isLifestyleOpen); }
 
 function setProfile(p) {
   document.querySelectorAll('.profile-btn').forEach(b => b.classList.remove('active'));
-  const btn = document.querySelector(`[data-profile="${p}"]`);
-  if (btn) btn.classList.add('active');
+  document.querySelector(`[data-profile="${p}"]`)?.classList.add('active');
 
   const prof = PROFILES[p];
-  spend   = { ...prof.spend };
-  trips   = prof.trips;
-  toggles = { ...prof.toggles };
+  spend = { ...prof.spend }; trips = prof.trips; toggles = { ...prof.toggles };
 
   SPEND_GROUPS.forEach(g => calcBase(g.id));
-  
-  const tv = document.getElementById('trips-val');
-  if (tv) tv.textContent = trips;
-
-  TOGGLES.forEach(t => {
-    const el = document.getElementById('tog-' + t.key);
-    if (el) el.checked = toggles[t.key] || false;
-  });
-
+  document.getElementById('trips-val').textContent = trips;
+  TOGGLES.forEach(t => { const el = document.getElementById('tog-' + t.key); if (el) el.checked = toggles[t.key] || false; });
   SPEND_GROUPS.forEach(g => {
     const hasSubSpend = g.subs.some(sub => (spend[sub.key] || 0) > 0);
-    const sub = document.getElementById('sub-' + g.id);
-    const eb  = document.getElementById('exp-' + g.id);
-    if (sub) sub.classList.toggle('open', hasSubSpend);
-    if (eb)  eb.classList.toggle('open', hasSubSpend);
+    document.getElementById('sub-' + g.id)?.classList.toggle('open', hasSubSpend);
+    document.getElementById('exp-' + g.id)?.classList.toggle('open', hasSubSpend);
   });
-
-  syncUI();
-  recalculate();
+  syncUI(); recalculate();
 }
 
 // ═══════════════════════════════════════════════════════════════════
 // RENDER RANKINGS
 // ═══════════════════════════════════════════════════════════════════
-const CAT_LABELS = {
-  grocery_instore:'In-store groceries', grocery_online:'Online groceries',
-  grocery_wholesale:'Wholesale clubs', dining:'Dining', delivery:'Food delivery',
-  travel_portal:'Travel portal', travel_direct:'Direct travel',
-  gas:'Gas & EV', transit:'Transit & rideshare', drugstore:'Drugstores', other:'Other spend',
-};
+const CAT_LABELS = { grocery_instore:'In-store groceries', grocery_online:'Online groceries', grocery_wholesale:'Wholesale clubs', dining:'Dining', delivery:'Food delivery', travel_portal:'Travel portal', travel_direct:'Direct travel', gas:'Gas & EV', transit:'Transit & rideshare', drugstore:'Drugstores', other:'Other spend' };
 
-function toggleDrawer(name) {
-  openCardName = openCardName === name ? null : name;
-  renderRankings();
-}
+function toggleDrawer(name) { openCardName = openCardName === name ? null : name; renderRankings(); }
 
 function buildDrawer(r, currentResult) {
-  const breakdownLines = Object.entries(r.breakdown)
-    .filter(([,v]) => v > 0.5)
-    .sort(([,a],[,b]) => b - a);
-
-  let hardHTML = breakdownLines.map(([k,v]) =>
-    `<div class="value-item"><span>${CAT_LABELS[k]||k}</span><span class="value-item-num">${fmt(v)}</span></div>`
-  ).join('');
-
-  if (r.annivBonus > 0)
-    hardHTML += `<div class="value-item"><span>Anniversary bonus</span><span class="value-item-num">${fmt(r.annivBonus)}</span></div>`;
-
+  const breakdownLines = Object.entries(r.breakdown).filter(([,v]) => v > 0.5).sort(([,a],[,b]) => b - a);
+  let hardHTML = breakdownLines.map(([k,v]) => `<div class="value-item"><span>${CAT_LABELS[k]||k}</span><span class="value-item-num">${fmt(v)}</span></div>`).join('');
+  if (r.annivBonus > 0) hardHTML += `<div class="value-item"><span>Anniversary bonus</span><span class="value-item-num">${fmt(r.annivBonus)}</span></div>`;
   hardHTML += `<div class="value-item" style="border-top:1px solid rgba(30,58,95,0.1);padding-top:5px;margin-top:3px"><span>Annual fee</span><span class="value-item-num">−${fmt(r.card.fee)}</span></div>`;
   hardHTML += `<div class="value-item total-line"><span>Net hard value</span><span class="value-item-num">${fmt(r.hard)}</span></div>`;
 
-  const softHTML = r.softItems.length
-    ? r.softItems.map(it => `<div class="value-item"><span>${it.label}</span><span class="value-item-num">${fmt(it.val)}</span></div>`).join('')
-    : '<div class="value-item" style="color:var(--ink3);font-style:italic"><span>No applicable perks selected</span></div>';
+  const softHTML = r.softItems.length ? r.softItems.map(it => `<div class="value-item"><span>${it.label}</span><span class="value-item-num">${fmt(it.val)}</span></div>`).join('') : '<div class="value-item" style="color:var(--ink3);font-style:italic"><span>No applicable perks selected</span></div>';
 
   const isCurrent = r.card.name === currentCardName;
   const d = currentResult ? (r.net - currentResult.net) : null;
-  const badgeText = isCurrent ? "You're currently on this card"
-    : d === null ? 'Select your current card to compare'
-    : d > 5  ? `Switch could save you ${fmt(d)} / yr →`
-    : d < -5 ? `${fmt(Math.abs(d))} less than your current card`
-    : 'Cards are roughly equivalent';
+  const badgeText = isCurrent ? "You're currently on this card" : d === null ? 'Select your current card to compare' : d > 5  ? `Switch could save you ${fmt(d)} / yr →` : d < -5 ? `${fmt(Math.abs(d))} less than your current card` : 'Cards are roughly equivalent';
   const badgeBg = isCurrent ? '#2D7A3D' : (d !== null && d > 5) ? 'var(--accent)' : '#888';
 
-  const promoHTML = r.promoValue > 0 
-    ? `<div class="drawer-promo"><strong>Sign-on Promo:</strong> ${r.card.promo.text} <br><span style="opacity:0.8; margin-top:2px; display:inline-block;">(Valued at <strong>${fmt(r.promoValue)}</strong> using your ${currentStrategy} strategy at ${(r.activePv*100).toFixed(1)}¢/pt)</span></div>`
-    : `<div class="drawer-promo" style="justify-content:center;"><strong>Sign-on Promo:</strong> ${r.card.promo.text}</div>`;
+  const promoHTML = r.promoValue > 0 ? `<div class="drawer-promo"><strong>Sign-on Promo:</strong> ${r.card.promo.text} <br><span style="opacity:0.8; margin-top:2px; display:inline-block;">(Valued at <strong>${fmt(r.promoValue)}</strong> using your ${currentStrategy} strategy at ${(r.activePv*100).toFixed(1)}¢/pt)</span></div>` : `<div class="drawer-promo" style="justify-content:center;"><strong>Sign-on Promo:</strong> ${r.card.promo.text}</div>`;
 
   return `
-  <div class="drawer-header-row">
-    <img src="${r.card.imgUrl}" alt="Card Image" class="drawer-card-img">
-    ${promoHTML}
-  </div>
+  <div class="drawer-header-row"><img src="${r.card.imgUrl}" alt="Card Image" class="drawer-card-img">${promoHTML}</div>
   <div class="drawer-inner">
-    <div class="value-card hard">
-      <div class="value-type">Hard value (Valued at ${(r.activePv * 100).toFixed(2)}¢/pt)</div>
-      <div class="value-amount">${fmt(r.hard)}</div>
-      <div class="value-desc">Rewards net of annual fee</div>
-      <div class="value-items">${hardHTML}</div>
-    </div>
-    <div class="value-card soft">
-      <div class="value-type">Soft value</div>
-      <div class="value-amount">${fmt(r.soft)}</div>
-      <div class="value-desc">Credits, perks & lifestyle benefits</div>
-      <div class="value-items">${softHTML}</div>
-    </div>
+    <div class="value-card hard"><div class="value-type">Hard value (Valued at ${(r.activePv * 100).toFixed(2)}¢/pt)</div><div class="value-amount">${fmt(r.hard)}</div><div class="value-desc">Rewards net of annual fee</div><div class="value-items">${hardHTML}</div></div>
+    <div class="value-card soft"><div class="value-type">Soft value</div><div class="value-amount">${fmt(r.soft)}</div><div class="value-desc">Credits, perks & lifestyle benefits</div><div class="value-items">${softHTML}</div></div>
   </div>
   ${r.card.notes ? `<div class="drawer-notes">ℹ ${r.card.notes}</div>` : ''}
-  <div class="drawer-total">
-    <div class="drawer-total-label">Total estimated value<strong>${fmt(r.net)} / yr</strong></div>
-    <span class="switch-badge" style="background:${badgeBg}">${badgeText}</span>
-  </div>`;
+  <div class="drawer-total"><div class="drawer-total-label">Total estimated value<strong>${fmt(r.net)} / yr</strong></div><span class="switch-badge" style="background:${badgeBg}">${badgeText}</span></div>`;
 }
 
 function renderRankings() {
-  if (!lastResults.length) return;
-  const currentResult = currentCardName
-    ? lastResults.find(r => r.card.name === currentCardName) || null
-    : null;
+  const currentResult = currentCardName ? lastResults.find(r => r.card.name === currentCardName) || null : null;
   const recList = document.getElementById('rec-list');
   if (!recList) return;
+
+  if (!lastResults.length) {
+    recList.innerHTML = `<div style="text-align:center; padding: 40px; background: var(--card); border-radius: var(--radius); border: 1.5px dashed var(--border); color: var(--ink2);">No cards matched your credit score criteria.</div>`;
+    return;
+  }
 
   recList.innerHTML = lastResults.map((r, i) => {
     const isCurrent = r.card.name === currentCardName;
     const d = currentResult ? (r.net - currentResult.net) : null;
-    const deltaStr = isCurrent ? 'Your current card'
-      : d === null ? ''
-      : d > 0 ? '+' + fmt(d) + ' vs current'
-      : fmt(d) + ' vs current';
+    const deltaStr = isCurrent ? 'Your current card' : d === null ? '' : d > 0 ? '+' + fmt(d) + ' vs current' : fmt(d) + ' vs current';
     const deltaClass = isCurrent ? 'rec-delta' : (d !== null && d > 0) ? 'rec-delta positive' : 'rec-delta';
     const isOpen = openCardName === r.card.name;
     const badgeCls = r.card.earnType === 'cash' ? 'badge-cash' : r.card.earnType === 'miles' ? 'badge-miles' : 'badge-points';
@@ -974,23 +930,15 @@ function renderRankings() {
     const topRate = topCat ? fmtR(r.card.rates[topCat[0]][0].rate, r.card.earnType) : '';
     const topLabel = topCat ? CAT_LABELS[topCat[0]] : '';
     const why = topLabel ? `Best earn: ${topRate} on ${topLabel}` : '';
-    
-    const promoStr = r.promoValue > 0 ? `Up to ${fmt(r.promoValue)}` : 'Match';
-    
     const applyBtn = `<a href="${r.card.applyUrl}" target="_blank" class="apply-btn" onclick="event.stopPropagation()">Apply</a>`;
+    const promoStr = r.promoValue > 0 ? `Up to ${fmt(r.promoValue)}` : 'Match';
 
     return `<div class="rec-wrap${isOpen ? ' open' : ''} fade-up" style="animation-delay:${i*0.03}s">
       <div class="rec-card${i===0?' top':''}" onclick="toggleDrawer('${r.card.name.replace(/'/g,"\\'")}')">
         <div class="rec-rank">${i+1}</div>
-        <div class="rec-info">
-          <div class="rec-name">${r.card.name}<span class="rec-type-badge ${badgeCls}">${badgeLabel}</span></div>
-          <div class="rec-why">${why}</div>
-        </div>
+        <div class="rec-info"><div class="rec-name">${r.card.name}<span class="rec-type-badge ${badgeCls}">${badgeLabel}</span></div><div class="rec-why">${why}</div></div>
         <div class="rec-value">
-          <div class="rec-promo">
-            <span class="rec-stat-label promo-label">Sign-On Bonus</span>
-            <span class="rec-stat-num promo">${promoStr}</span>
-          </div>
+          <div class="rec-promo"><span class="rec-stat-label promo-label">Sign-On Bonus</span><span class="rec-stat-num promo">${promoStr}</span></div>
           <div class="rec-summary">
             <div class="rec-stat"><span class="rec-stat-label hard-label">Hard</span><span class="rec-stat-num">${fmt(r.hard)}</span></div>
             <div class="rec-stat"><span class="rec-stat-label soft-label">Soft</span><span class="rec-stat-num">${fmt(r.soft)}</span></div>
@@ -1007,8 +955,19 @@ function renderRankings() {
 }
 
 function recalculate() {
-  lastResults = CARDS.map(c => ({ card:c, ...calcCard(c) })).sort((a,b) => b.net - a.net);
-  if (!openCardName) openCardName = lastResults[0]?.card.name || null;
+  const tierMap = { 'Building': 1, 'Fair': 2, 'Good': 3, 'Excellent': 4 };
+  
+  // 1. Filter cards by the selected credit score
+  const eligibleCards = CARDS.filter(c => tierMap[c.credit] <= userScoreFilter);
+  
+  // 2. Map their math and sort
+  lastResults = eligibleCards.map(c => ({ card:c, ...calcCard(c) })).sort((a,b) => b.net - a.net);
+  
+  // If the currently open card was filtered out, open the top card instead
+  if (!lastResults.some(r => r.card.name === openCardName) && lastResults.length > 0) {
+    openCardName = lastResults[0].card.name;
+  }
+  
   renderRankings();
 }
 
@@ -1020,72 +979,24 @@ function renderUI() {
     const prof = PROFILES[p];
     const ptotal = SPEND_GROUPS.reduce((s, g) => s + (prof.spend[g.main.key]||0), 0) * 12;
     return `<button class="profile-btn${p==='B'?' active':''}" data-profile="${p}" onclick="setProfile('${p}')">
-      <div class="profile-letter">${p}</div>
-      <div class="profile-name">${prof.label}</div>
-      <div class="profile-desc">${prof.desc}</div>
-      <div class="profile-total">${fmt(ptotal)} / yr</div>
+      <div class="profile-letter">${p}</div><div class="profile-name">${prof.label}</div><div class="profile-desc">${prof.desc}</div><div class="profile-total">${fmt(ptotal)} / yr</div>
     </button>`;
   }).join('');
 
   const slidersHTML = SPEND_GROUPS.map(g => {
     const mainVal = spend[g.main.key] || 0;
-
     const subRowsHTML = g.subs.map(si => {
       const sv = spend[si.key] || 0;
-      return `<div class="sub-row">
-        <div class="sub-label"><span class="cat-icon">${si.icon}</span>${si.label}</div>
-        <input type="range" id="sl-${si.key}" min="0" max="${g.main.max}" step="${g.main.step}" value="${sv}"
-          oninput="updateSub('${g.id}', '${si.key}', this.value)">
-        <div class="cat-val-wrap">
-          <div class="sub-value" id="val-${si.key}">${fmt(sv)}</div>
-          <div class="sub-annual" id="ann-${si.key}">${fmt(sv*12)}/yr</div>
-        </div>
-        <div></div>
-      </div>`;
+      return `<div class="sub-row"><div class="sub-label"><span class="cat-icon">${si.icon}</span>${si.label}</div><input type="range" id="sl-${si.key}" min="0" max="${g.main.max}" step="${g.main.step}" value="${sv}" oninput="updateSub('${g.id}', '${si.key}', this.value)"><div class="cat-val-wrap"><div class="sub-value" id="val-${si.key}">${fmt(sv)}</div><div class="sub-annual" id="ann-${si.key}">${fmt(sv*12)}/yr</div></div><div></div></div>`;
     }).join('');
+    const baseRowHTML = `<div class="sub-row base-row"><div class="sub-label"><span class="cat-icon">↳</span>${g.baseLabel}</div><div class="base-bar-placeholder"></div><div class="cat-val-wrap"><div class="sub-value" id="val-${g.baseKey}">$0</div><div class="sub-annual" id="ann-${g.baseKey}">$0/yr</div></div><div></div></div>`;
 
-    const baseRowHTML = `<div class="sub-row base-row">
-        <div class="sub-label"><span class="cat-icon">↳</span>${g.baseLabel}</div>
-        <div class="base-bar-placeholder"></div>
-        <div class="cat-val-wrap">
-          <div class="sub-value" id="val-${g.baseKey}">$0</div>
-          <div class="sub-annual" id="ann-${g.baseKey}">$0/yr</div>
-        </div>
-        <div></div>
-    </div>`;
-
-    return `<div class="cat-group">
-      <div class="category">
-        <div class="cat-label"><span class="cat-icon">${g.icon}</span>${g.main.label}</div>
-        <input type="range" id="sl-${g.main.key}" min="0" max="${g.main.max}" step="${g.main.step}" value="${mainVal}"
-          oninput="updateMain('${g.id}', this.value)">
-        <div class="cat-val-wrap">
-          <div class="cat-value" id="val-${g.main.key}">${fmt(mainVal)}</div>
-          <div class="cat-annual" id="ann-${g.main.key}">${fmt(mainVal*12)}/yr</div>
-        </div>
-        <button class="expand-btn" id="exp-${g.id}" onclick="toggleSub('${g.id}')" title="Sub-categories">▶</button>
-      </div>
-      <div class="sub-rows" id="sub-${g.id}">
-        ${subRowsHTML}
-        ${baseRowHTML}
-      </div>
-    </div>`;
+    return `<div class="cat-group"><div class="category"><div class="cat-label"><span class="cat-icon">${g.icon}</span>${g.main.label}</div><input type="range" id="sl-${g.main.key}" min="0" max="${g.main.max}" step="${g.main.step}" value="${mainVal}" oninput="updateMain('${g.id}', this.value)"><div class="cat-val-wrap"><div class="cat-value" id="val-${g.main.key}">${fmt(mainVal)}</div><div class="cat-annual" id="ann-${g.main.key}">${fmt(mainVal*12)}/yr</div></div><button class="expand-btn" id="exp-${g.id}" onclick="toggleSub('${g.id}')" title="Sub-categories">▶</button></div><div class="sub-rows" id="sub-${g.id}">${subRowsHTML}${baseRowHTML}</div></div>`;
   }).join('');
 
-  const togglesHTML = TOGGLES.map(t =>
-    `<div class="toggle-row">
-      <div class="toggle-label-wrap">
-        <div class="toggle-label">${t.label}</div>
-        <div class="toggle-sub">${t.sub}</div>
-      </div>
-      <label class="toggle">
-        <input type="checkbox" id="tog-${t.key}" ${toggles[t.key] ? 'checked' : ''} onchange="setToggle('${t.key}',this.checked)">
-        <div class="toggle-track"></div>
-      </label>
-    </div>`
-  ).join('');
+  const togglesHTML = TOGGLES.map(t => `<div class="toggle-row"><div class="toggle-label-wrap"><div class="toggle-label">${t.label}</div><div class="toggle-sub">${t.sub}</div></div><label class="toggle"><input type="checkbox" id="tog-${t.key}" ${toggles[t.key] ? 'checked' : ''} onchange="setToggle('${t.key}',this.checked)"><div class="toggle-track"></div></label></div>`).join('');
 
-  // Auto-group cards by issuer
+  // Auto-group cards by issuer (Using the unfiltered database so the user can always find their actual card)
   const groupedCards = CARDS.reduce((acc, card) => {
     if (!acc[card.issuer]) acc[card.issuer] = [];
     acc[card.issuer].push(card);
@@ -1095,9 +1006,7 @@ function renderUI() {
   let cardOptions = '<option value="">— No current card —</option>';
   Object.keys(groupedCards).sort().forEach(issuer => {
     cardOptions += `<optgroup label="${issuer}">`;
-    groupedCards[issuer].forEach(c => {
-      cardOptions += `<option value="${c.name}">${c.name}</option>`;
-    });
+    groupedCards[issuer].forEach(c => { cardOptions += `<option value="${c.name}">${c.name}</option>`; });
     cardOptions += `</optgroup>`;
   });
 
@@ -1108,69 +1017,38 @@ function renderUI() {
     <div class="strategy-panel">
       <div class="section-label" style="margin-bottom:12px;">How do you prefer to redeem your rewards?</div>
       <div class="strategy-controls">
-        <label class="strat-label">
-          <input type="radio" name="strat" value="cash" onchange="setStrategy(this.value)">
-          <div class="strat-box">
-            <div class="strat-title">Statement Credit</div>
-            <div class="strat-desc">Pure cash back (Values Amex at 0.6¢)</div>
-          </div>
-        </label>
-        <label class="strat-label">
-          <input type="radio" name="strat" value="portal" checked onchange="setStrategy(this.value)">
-          <div class="strat-box">
-            <div class="strat-title">Travel Portal</div>
-            <div class="strat-desc">Easy travel booking (Values Chase at 1.5¢)</div>
-          </div>
-        </label>
-        <label class="strat-label">
-          <input type="radio" name="strat" value="transfer" onchange="setStrategy(this.value)">
-          <div class="strat-box">
-            <div class="strat-title">Transfer Partners</div>
-            <div class="strat-desc">Optimized travel (Values points at 2.0¢)</div>
-          </div>
-        </label>
+        <label class="strat-label"><input type="radio" name="strat" value="cash" onchange="setStrategy(this.value)"><div class="strat-box"><div class="strat-title">Statement Credit</div><div class="strat-desc">Pure cash back (Values Amex at 0.6¢)</div></div></label>
+        <label class="strat-label"><input type="radio" name="strat" value="portal" checked onchange="setStrategy(this.value)"><div class="strat-box"><div class="strat-title">Travel Portal</div><div class="strat-desc">Easy travel booking (Values Chase at 1.5¢)</div></div></label>
+        <label class="strat-label"><input type="radio" name="strat" value="transfer" onchange="setStrategy(this.value)"><div class="strat-box"><div class="strat-title">Transfer Partners</div><div class="strat-desc">Optimized travel (Values points at 2.0¢)</div></div></label>
       </div>
     </div>
 
     <div class="spend-panel">
-      <div class="spend-panel-header">
-        <div class="section-label" style="margin:0">Spend by category — slide to adjust</div>
-        <div class="total-year">Total / yr &nbsp;<span id="grand-total">$0</span></div>
-      </div>
+      <div class="spend-panel-header"><div class="section-label" style="margin:0">Spend by category — slide to adjust</div><div class="total-year">Total / yr &nbsp;<span id="grand-total">$0</span></div></div>
       ${slidersHTML}
     </div>
 
     <div class="lifestyle-panel" id="lifestyle-panel">
-      <div class="lifestyle-header" onclick="toggleLifestyle()">
-        <div>
-          <div class="section-label" style="margin:0; color:var(--ink);">Your lifestyle perks</div>
-          <div style="font-size:11px; color:var(--ink2); margin-top:3px;">Currently showing max potential value. Click to customize.</div>
-        </div>
-        <div class="lifestyle-chevron">▼</div>
-      </div>
-      <div class="lifestyle-content">
-        <div class="lifestyle-content-inner">
-          <div class="stepper-row">
-            <div class="toggle-label-wrap">
-              <div class="toggle-label">Trips per year</div>
-              <div class="toggle-sub">Values lounge access at ~$30/visit</div>
-            </div>
-            <div class="stepper-controls">
-              <button class="stepper-btn" onclick="setTrips(trips-1)">−</button>
-              <div class="stepper-val" id="trips-val">${trips}</div>
-              <button class="stepper-btn" onclick="setTrips(trips+1)">+</button>
-            </div>
-          </div>
-          <div class="toggle-grid">${togglesHTML}</div>
-        </div>
-      </div>
+      <div class="lifestyle-header" onclick="toggleLifestyle()"><div><div class="section-label" style="margin:0; color:var(--ink);">Your lifestyle perks</div><div style="font-size:11px; color:var(--ink2); margin-top:3px;">Currently showing max potential value. Click to customize.</div></div><div class="lifestyle-chevron">▼</div></div>
+      <div class="lifestyle-content"><div class="lifestyle-content-inner"><div class="stepper-row"><div class="toggle-label-wrap"><div class="toggle-label">Trips per year</div><div class="toggle-sub">Values lounge access at ~$30/visit</div></div><div class="stepper-controls"><button class="stepper-btn" onclick="setTrips(trips-1)">−</button><div class="stepper-val" id="trips-val">${trips}</div><button class="stepper-btn" onclick="setTrips(trips+1)">+</button></div></div><div class="toggle-grid">${togglesHTML}</div></div></div>
     </div>
 
-    <div class="current-card-select">
-      <label>Your current card:</label>
-      <select onchange="currentCardName=this.value;recalculate()">
-        ${cardOptions}
-      </select>
+    <div class="controls-row">
+      <div class="control-group">
+        <label>Your Credit Score:</label>
+        <select id="score-filter" onchange="setScoreFilter(this.value)">
+          <option value="4" selected>Excellent (720+)</option>
+          <option value="3">Good (690-719)</option>
+          <option value="2">Fair (630-689)</option>
+          <option value="1">Building (< 630)</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>Your current card:</label>
+        <select id="current-card-select" onchange="currentCardName=this.value;recalculate()">
+          ${cardOptions}
+        </select>
+      </div>
     </div>
 
     <div class="section-label">All cards ranked for your profile — click to expand</div>
@@ -1178,8 +1056,7 @@ function renderUI() {
   `;
 
   SPEND_GROUPS.forEach(g => calcBase(g.id));
-  syncUI();
-  recalculate();
+  syncUI(); recalculate();
 }
 
 renderUI();
